@@ -1,7 +1,5 @@
 (() => {
   const STORAGE_KEY = 'healthy-desserts-clean-state-v1';
-  const STUDENT_ID = '000255928';
-  const ADMIN_ID = 'Admin';
   const availableClassrooms = new Set();
   const classroomCatalogPromise = loadClassroomCatalog();
 
@@ -229,14 +227,10 @@
   ];
 
   const el = {
-    authScreen: document.getElementById('authScreen'),
     studentScreen: document.getElementById('studentScreen'),
     adminScreen: document.getElementById('adminScreen'),
-    loginForm: document.getElementById('loginForm'),
-    loginUser: document.getElementById('loginUser'),
-    loginPassword: document.getElementById('loginPassword'),
-    logoutStudent: document.getElementById('logoutStudent'),
-    logoutAdmin: document.getElementById('logoutAdmin'),
+    goToAdminButton: document.getElementById('goToAdminButton'),
+    backToStoreButton: document.getElementById('backToStoreButton'),
     restartQuizButton: document.getElementById('restartQuizButton'),
     wizardProgress: document.getElementById('wizardProgress'),
     wizardStepLabel: document.getElementById('wizardStepLabel'),
@@ -271,11 +265,9 @@
     profileSnacks: document.getElementById('profileSnacks'),
     profileCalories: document.getElementById('profileCalories'),
     savedPreferences: document.getElementById('savedPreferences'),
-    openChangePasswordButton: document.getElementById('openChangePasswordButton'),
-    passwordModal: document.getElementById('passwordModal'),
-    passwordForm: document.getElementById('passwordForm'),
-    newPassword: document.getElementById('newPassword'),
-    confirmPassword: document.getElementById('confirmPassword'),
+    adminPasswordModal: document.getElementById('adminPasswordModal'),
+    adminPasswordForm: document.getElementById('adminPasswordForm'),
+    adminPasswordInput: document.getElementById('adminPasswordInput'),
     orderConfirmationModal: document.getElementById('orderConfirmationModal'),
     orderConfirmationCode: document.getElementById('orderConfirmationCode'),
     orderConfirmationClassroom: document.getElementById('orderConfirmationClassroom'),
@@ -295,21 +287,16 @@
   };
 
   const state = loadState();
-  let activeUserId = null;
   let selectedFilter = state.student.selectedFilter || 'todos';
   let selectedView = 'home';
 
   function defaultState() {
     return {
-      users: {
-        [STUDENT_ID]: { id: STUDENT_ID, password: STUDENT_ID, role: 'student', firstLogin: true, profile: { daysActive: 12, healthySnacks: 27, avoidedCoffee: 9 } },
-        [ADMIN_ID]: { id: ADMIN_ID, password: ADMIN_ID, role: 'admin', firstLogin: false },
-      },
       student: {
         answers: { diet: '', need: '', format: '' },
         selectedFilter: 'todos',
         cart: [],
-        profile: { daysActive: 12, healthySnacks: 27, avoidedCoffee: 9 },
+        profile: { daysActive: 0, healthySnacks: 0, avoidedCoffee: 0 },
       },
       orders: [],
     };
@@ -324,15 +311,12 @@
       return {
         ...base,
         ...parsed,
-        users: { ...base.users, ...(parsed.users || {}) },
         student: {
           ...base.student,
           ...(parsed.student || {}),
           answers: { ...base.student.answers, ...((parsed.student && parsed.student.answers) || {}) },
           profile: { ...base.student.profile, ...((parsed.student && parsed.student.profile) || {}) },
-          cart: Array.isArray(parsed.student && parsed.student.cart)
-            ? (parsed.student.cart.length === 1 && parsed.student.cart[0] && parsed.student.cart[0].id === 'trufas-matcha' ? [] : parsed.student.cart)
-            : base.student.cart,
+          cart: Array.isArray(parsed.student && parsed.student.cart) ? parsed.student.cart : base.student.cart,
         },
         orders: Array.isArray(parsed.orders) ? parsed.orders : [],
       };
@@ -386,7 +370,7 @@
   }
 
   function profile() {
-    if (!state.student.profile) state.student.profile = { daysActive: 12, healthySnacks: 27, avoidedCoffee: 9 };
+    if (!state.student.profile) state.student.profile = { daysActive: 0, healthySnacks: 0, avoidedCoffee: 0 };
     return state.student.profile;
   }
 
@@ -412,7 +396,6 @@
   }
 
   function setScreen(mode) {
-    el.authScreen.classList.toggle('is-hidden', !!mode);
     el.studentScreen.classList.toggle('is-hidden', mode !== 'student');
     el.adminScreen.classList.toggle('is-hidden', mode !== 'admin');
   }
@@ -443,7 +426,7 @@
   function renderMatch() {
     const isComplete = QUESTIONS.every((question) => state.student.answers[question.key]);
     if (!isComplete) {
-      const preview = CATALOG[(profile().daysActive + profile().healthySnacks) % CATALOG.length];
+      const preview = CATALOG[(profile().daysActive + profile().healthySnacks + 1) % CATALOG.length];
       el.matchName.textContent = 'Completa tu perfil para personalizar';
       el.matchDescription.textContent = 'Responde las 3 preguntas para descubrir el postre que mejor encaja con tu momento, tu energía y tu formato ideal.';
       el.matchTags.innerHTML = '<span>Quiz pendiente</span><span>Recomendación dinámica</span>';
@@ -563,7 +546,7 @@
     el.profileCalories.textContent = String(p.avoidedCoffee);
     el.savedPreferences.textContent = Object.values(state.student.answers).filter(Boolean).join(' · ') || 'Sin preferencias guardadas aún.';
     const cartCount = state.student.cart.reduce((sum, entry) => sum + entry.quantity, 0);
-    const energy = Math.min(100, 45 + cartCount * 8 + (itemHasTag(recommendedProduct(), 'energia') ? 8 : 0));
+    const energy = Math.min(100, Math.max(0, cartCount * 8));
     el.energyScore.textContent = String(energy);
     el.energyBar.style.width = `${energy}%`;
     el.recommendationNote.textContent = cartCount ? `Tienes ${cartCount} snack${cartCount === 1 ? '' : 's'} listo${cartCount === 1 ? '' : 's'} para tu jornada.` : `Mantén el ritmo con ${recommendedProduct().name} para tu próxima clase.`;
@@ -592,7 +575,7 @@
       <article class="catalog-card"><div class="catalog-card__visual" data-emoji="${item.emoji}"></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>
     `).join('');
     el.studentList.innerHTML = `
-      <article class="student-item"><div class="student-item__body"><div class="student-item__header"><strong>Alumno ${STUDENT_ID}</strong><span class="admin-chip">${state.users[STUDENT_ID].firstLogin ? 'Clave inicial activa' : 'Cuenta configurada'}</span></div><p class="student-item__meta">Preferencias actuales: ${Object.values(state.student.answers).filter(Boolean).join(' · ') || 'Sin preferencias guardadas aún.'}</p></div></article>
+      <article class="student-item"><div class="student-item__body"><strong>Tienda abierta</strong><p class="student-item__meta">Cualquier persona puede pedir sin necesidad de cuenta.</p></div></article>
       <article class="student-item"><div class="student-item__body"><strong>Pedidos con entrega de aula</strong><p class="student-item__meta">Solo se aceptan aulas incluidas en aulas.csv.</p></div></article>
     `;
   }
@@ -608,44 +591,6 @@
     if (view === 'profile') el.profileSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
-  function openPasswordModal() {
-    el.passwordModal.classList.remove('is-hidden');
-    el.newPassword.value = '';
-    el.confirmPassword.value = '';
-    el.newPassword.focus();
-  }
-
-  function closePasswordModal() {
-    el.passwordModal.classList.add('is-hidden');
-  }
-
-  function login(event) {
-    event.preventDefault();
-    const userId = el.loginUser.value.trim();
-    const password = el.loginPassword.value;
-    const user = state.users[userId];
-    if (!user || user.password !== password) { toast('Credenciales inválidas.'); return; }
-    activeUserId = userId;
-    if (user.role === 'student' && user.firstLogin && password === STUDENT_ID) { openPasswordModal(); toast('Primer acceso detectado. Crea tu nueva contraseña.'); return; }
-    if (user.role === 'student') { setScreen('student'); renderQuestionnaire(); renderMatch(); renderMenu(); renderCart(); renderProfile(); showView('home'); toast('Sesión iniciada como alumno.'); return; }
-    setScreen('admin'); renderAdmin(); toast('Sesión iniciada como administrador.');
-  }
-
-  function savePassword(event) {
-    event.preventDefault();
-    const nextPassword = el.newPassword.value.trim();
-    const confirm = el.confirmPassword.value.trim();
-    if (nextPassword.length < 8) { toast('La nueva contraseña debe tener al menos 8 caracteres.'); return; }
-    if (nextPassword !== confirm) { toast('Las contraseñas no coinciden.'); return; }
-    state.users[STUDENT_ID].password = nextPassword;
-    state.users[STUDENT_ID].firstLogin = false;
-    saveState();
-    closePasswordModal();
-    setScreen('student');
-    renderQuestionnaire(); renderMatch(); renderMenu(); renderCart(); renderProfile(); showView('home');
-    toast('Contraseña actualizada correctamente.');
-  }
-
   async function submitOrder(event) {
     event.preventDefault();
     await classroomCatalogPromise;
@@ -658,7 +603,7 @@
       return { id: item.id, name: item.name, price: item.price, emoji: item.emoji, quantity: entry.quantity };
     });
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    state.orders.unshift({ id: `HD-${Date.now().toString(36).toUpperCase()}`, userId: activeUserId, classroom, status: 'new', createdAt: new Date().toISOString(), items, total: Number(total.toFixed(2)) });
+    state.orders.unshift({ id: `HD-${Date.now().toString(36).toUpperCase()}`, userId: null, classroom, status: 'new', createdAt: new Date().toISOString(), items, total: Number(total.toFixed(2)) });
     state.student.cart = [];
     profile().daysActive += 1;
     profile().healthySnacks += 1;
@@ -689,18 +634,39 @@
     location.reload();
   }
 
-  el.loginForm.addEventListener('submit', login);
-  el.passwordForm.addEventListener('submit', savePassword);
-  el.logoutStudent.addEventListener('click', () => setScreen(null));
-  el.logoutAdmin.addEventListener('click', () => setScreen(null));
+  function openAdminPasswordModal() {
+    el.adminPasswordInput.value = '';
+    el.adminPasswordModal.classList.remove('is-hidden');
+    el.adminPasswordInput.focus();
+  }
+
+  function closeAdminPasswordModal() {
+    el.adminPasswordModal.classList.add('is-hidden');
+  }
+
+  function handleAdminPasswordSubmit(event) {
+    event.preventDefault();
+    if (el.adminPasswordInput.value.trim() === '123456789') {
+      closeAdminPasswordModal();
+      setScreen('admin');
+      renderAdmin();
+    } else {
+      toast('Contraseña incorrecta.');
+      el.adminPasswordInput.value = '';
+      el.adminPasswordInput.focus();
+    }
+  }
+
+  el.goToAdminButton.addEventListener('click', openAdminPasswordModal);
+  el.adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
+  el.adminPasswordModal.addEventListener('click', (event) => { if (event.target === el.adminPasswordModal) closeAdminPasswordModal(); });
+  el.backToStoreButton.addEventListener('click', () => { setScreen('student'); });
   el.restartQuizButton.addEventListener('click', () => { state.student.answers = { diet: '', need: '', format: '' }; saveState(); renderQuestionnaire(); renderMatch(); renderProfile(); toast('Flujo reiniciado.'); });
   el.wizardNextButton.addEventListener('click', () => { const unanswered = QUESTIONS.find((question) => !state.student.answers[question.key]); if (unanswered) { toast('Selecciona una opción para continuar.'); return; } toast(`Tu match es ${recommendedProduct().name}.`); el.matchCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   el.addMatchToCartButton.addEventListener('click', () => { const match = recommendedProduct(); const existing = state.student.cart.find((entry) => entry.id === match.id); if (existing) existing.quantity += 1; else state.student.cart.push({ id: match.id, quantity: 1 }); saveState(); renderCart(); renderProfile(); toast(`${match.name} añadido al carrito.`); showView('cart'); });
   el.viewCartShortcut.addEventListener('click', () => showView('cart'));
   el.backToMenuButton.addEventListener('click', () => showView('menu'));
   el.orderForm.addEventListener('submit', submitOrder);
-  el.openChangePasswordButton.addEventListener('click', openPasswordModal);
-  el.passwordModal.addEventListener('click', (event) => { if (event.target === el.passwordModal) closePasswordModal(); });
   el.orderConfirmationModal.addEventListener('click', (event) => { if (event.target === el.orderConfirmationModal) closeOrderConfirmation(); });
   el.closeOrderConfirmationButton.addEventListener('click', closeOrderConfirmation);
   el.resetDemoDataButton.addEventListener('click', resetDemo);
@@ -721,6 +687,6 @@
       renderCart();
       renderProfile();
       renderAdmin();
-      setScreen(null);
+      setScreen('student');
     });
 })();
