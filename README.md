@@ -8,7 +8,8 @@ Prototipo web mobile-first para estudiantes, construido con HTML, CSS y JavaScri
 - Cambio obligatorio de contraseña en el primer acceso del alumno.
 - Flujo interactivo de personalización del postre.
 - Menú inteligente con filtros y recomendaciones.
-- Carrito con validación de aula/salón.
+- Catálogo ampliado con postres peruanos y opciones saludables personalizables.
+- Carrito con validación de aula/salón completo y confirmación simbólica del pedido.
 - Panel admin para seguimiento de pedidos y catálogo.
 - Persistencia local con `localStorage`.
 
@@ -30,10 +31,11 @@ Prototipo web mobile-first para estudiantes, construido con HTML, CSS y JavaScri
 
 ## Uso
 
-1. Inicia sesión con una de las cuentas de prueba.
-2. Si entras como alumno por primera vez, cambia la contraseña.
-3. Personaliza tu postre, agrega al carrito y confirma el pedido.
+1. Abre `index.html` en el navegador.
+2. Inicia sesión con una de las cuentas de prueba.
+3. Si entras como alumno por primera vez, cambia la contraseña.
+4. Personaliza tu postre, agrega al carrito y confirma el pedido.
 
 ## Validación
 
-El campo de aula/salón acepta formatos como `G503`, `C201` y `K607`.
+El campo de aula/salón acepta formatos como `G503`, `C201` y `K607`. El pago es presencial al recoger el pedido; no existe pasarela de pago.

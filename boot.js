@@ -2,16 +2,199 @@
   const STORAGE_KEY = 'healthy-desserts-clean-state-v1';
   const STUDENT_ID = '000255928';
   const ADMIN_ID = 'Admin';
-  const CLASSROOM_PATTERN = /^[A-Z]\d{3}$/;
+  const availableClassrooms = new Set();
+  const classroomCatalogPromise = loadClassroomCatalog();
+
+  function normalizeClassroom(classroom) {
+    return classroom.trim().toUpperCase();
+  }
+
+  function isAvailableClassroom(classroom) {
+    return availableClassrooms.has(normalizeClassroom(classroom));
+  }
+
+  async function loadClassroomCatalog() {
+    const response = await fetch('aulas.csv', { cache: 'no-store' });
+    if (!response.ok) {
+      throw new Error(`No se pudo cargar aulas.csv (${response.status})`);
+    }
+
+    const csvText = await response.text();
+    const classrooms = csvText
+      .split(/\r?\n/)
+      .flatMap((line) => line.split(','))
+      .map((value) => value.trim().toUpperCase())
+      .filter(Boolean);
+
+    classrooms.forEach((classroom) => availableClassrooms.add(classroom));
+    return Array.from(availableClassrooms).sort();
+  }
+
+  function renderClassroomCatalog() {
+    if (!el.classroomOptions) return;
+    el.classroomOptions.innerHTML = Array.from(availableClassrooms)
+      .sort()
+      .map((classroom) => `<option value="${classroom}"></option>`)
+      .join('');
+  }
 
   const CATALOG = [
-    { id: 'brownie-keto', name: 'Brownie Keto Energizante', price: 8.5, calories: 180, badge: 'Sin azúcar', emoji: '🍫', tags: ['keto', 'energía', 'concentración'], flavor: 'Cacao puro + nueces', description: 'Ideal para recuperar enfoque sin picos de azúcar.', benefits: ['Energía sostenida', 'Alta saciedad'] },
-    { id: 'trufas-matcha', name: 'Trufas de Matcha', price: 12, calories: 140, badge: 'Alto en proteína', emoji: '🍵', tags: ['concentración', 'anti-estrés', 'proteína'], flavor: 'Matcha ceremonial + almendra', description: 'Textura suave y efecto calmante para sesiones largas de estudio.', benefits: ['Enfoque mental', 'Sensorial premium'] },
-    { id: 'galletas-avena', name: 'Galletas Avena & Arándanos', price: 9, calories: 210, badge: 'Alto en fibra', emoji: '🫐', tags: ['energía', 'tradicional', 'fibra'], flavor: 'Avena integral + arándanos', description: 'Perfectas para una tarde activa con energía duradera.', benefits: ['Fibra natural', 'Dulzor equilibrado'] },
-    { id: 'barras-maca-cacao', name: 'Barras Maca & Cacao', price: 7.5, calories: 165, badge: 'Energía limpia', emoji: '⚡', tags: ['energía', 'sin gluten', 'estudio'], flavor: 'Maca andina + nibs de cacao', description: 'Un snack práctico para rendir sin caer pesado.', benefits: ['Rápidas de llevar', 'Buenas para antes de clases'] },
-    { id: 'mousse-chia', name: 'Mousse de Chía y Mango', price: 10, calories: 155, badge: 'Vegano', emoji: '🥭', tags: ['vegano', 'fresco', 'digestivo'], flavor: 'Chía hidratada + mango', description: 'Ligero, fresco y amable para horas largas en campus.', benefits: ['Digestión ligera', 'Opción plant-based'] },
-    { id: 'tarta-limon', name: 'Tarta de Limón Proteica', price: 11.5, calories: 190, badge: 'Proteína', emoji: '🍋', tags: ['proteína', 'fresco', 'post-entreno'], flavor: 'Cítricos + yogur alto en proteína', description: 'Equilibrio entre frescura y aporte nutritivo.', benefits: ['Recarga de tarde', 'Sabor vibrante'] },
-    { id: 'barritas-cacao', name: 'Barritas Cacao & Nuez', price: 7.5, calories: 172, badge: 'Sin gluten', emoji: '🌰', tags: ['sin gluten', 'keto', 'energía'], flavor: 'Cacao amargo + nueces tostadas', description: 'Crujiente, simple y fácil de sumar al pedido.', benefits: ['Snack de bolsillo', 'Bajo índice glucémico'] },
+    {
+      id: 'brownie-keto',
+      name: 'Brownie Keto Energizante',
+      price: 8.5,
+      calories: 180,
+      badge: 'Sin azúcar',
+      emoji: '🍫',
+      tags: ['keto', 'energia', 'concentracion', 'portable'],
+      flavor: 'Cacao puro + nueces',
+      description: 'Ideal para recuperar enfoque sin picos de azúcar.',
+      benefits: ['Energía sostenida', 'Alta saciedad'],
+      match: { diet: ['keto'], need: ['energia', 'concentracion'], format: ['portable'] },
+    },
+    {
+      id: 'pie-limon-proteico',
+      name: 'Pie de Limón Proteico',
+      price: 11.5,
+      calories: 185,
+      badge: 'Fresco',
+      emoji: '🍋',
+      tags: ['tradicional', 'fresco', 'antiestres'],
+      flavor: 'Limón peruano + crema ligera alta en proteína',
+      description: 'Un clásico renovado para una pausa ligera y balanceada.',
+      benefits: ['Sabor cítrico', 'Postre de media tarde'],
+      match: { diet: ['tradicional'], need: ['antiestres'], format: ['fresco'] },
+    },
+    {
+      id: 'queque-zanahoria-canela',
+      name: 'Queque de Zanahoria y Canela',
+      price: 9.5,
+      calories: 220,
+      badge: 'Casero',
+      emoji: '🥕',
+      tags: ['tradicional', 'energia', 'portable'],
+      flavor: 'Zanahoria horneada + canela suave',
+      description: 'Denso, aromático y cómodo para acompañar la jornada.',
+      benefits: ['Sensación casera', 'Buen snack de ruta'],
+      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
+    },
+    {
+      id: 'galletas-quinoa-lucuma',
+      name: 'Galletas de Quinoa y Lúcuma',
+      price: 8,
+      calories: 160,
+      badge: 'Sin gluten',
+      emoji: '🟡',
+      tags: ['sin gluten', 'energia', 'portable'],
+      flavor: 'Quinoa pop + lúcuma arequipeña',
+      description: 'Crujientes y peruanas, pensadas para llevar sin complicaciones.',
+      benefits: ['Toque local', 'Textura crocante'],
+      match: { diet: ['sin gluten'], need: ['energia'], format: ['portable'] },
+    },
+    {
+      id: 'trufas-matcha',
+      name: 'Trufas de Matcha',
+      price: 12,
+      calories: 140,
+      badge: 'Alto en proteína',
+      emoji: '🍵',
+      tags: ['concentracion', 'antiestres', 'proteina', 'fresco'],
+      flavor: 'Matcha ceremonial + almendra',
+      description: 'Textura suave y efecto calmante para sesiones largas de estudio.',
+      benefits: ['Enfoque mental', 'Sensorial premium'],
+      match: { diet: ['vegano', 'sin gluten'], need: ['concentracion', 'antiestres'], format: ['portable'] },
+    },
+    {
+      id: 'mousse-chia-mango',
+      name: 'Mousse de Chía y Mango',
+      price: 10,
+      calories: 155,
+      badge: 'Vegano',
+      emoji: '🥭',
+      tags: ['vegano', 'fresco', 'antiestres'],
+      flavor: 'Chía hidratada + mango',
+      description: 'Ligero, fresco y amable para horas largas en campus.',
+      benefits: ['Digestión ligera', 'Opción plant-based'],
+      match: { diet: ['vegano'], need: ['antiestres'], format: ['fresco'] },
+    },
+    {
+      id: 'barras-maca-cacao',
+      name: 'Barras Maca & Cacao',
+      price: 7.5,
+      calories: 165,
+      badge: 'Energía limpia',
+      emoji: '⚡',
+      tags: ['energia', 'sin gluten', 'portable'],
+      flavor: 'Maca andina + nibs de cacao',
+      description: 'Un snack práctico para rendir sin caer pesado.',
+      benefits: ['Rápidas de llevar', 'Buenas para antes de clases'],
+      match: { diet: ['keto', 'sin gluten'], need: ['energia'], format: ['portable'] },
+    },
+    {
+      id: 'cheesecake-maracuya-light',
+      name: 'Cheesecake de Maracuyá Light',
+      price: 13.5,
+      calories: 175,
+      badge: 'Fresco',
+      emoji: '🧡',
+      tags: ['tradicional', 'fresco', 'antiestres'],
+      flavor: 'Maracuyá norteño + crema ligera',
+      description: 'Ácido, cremoso y pensado para una pausa con aire tropical.',
+      benefits: ['Perfil fresco', 'Muy compartible'],
+      match: { diet: ['tradicional'], need: ['antiestres'], format: ['fresco'] },
+    },
+    {
+      id: 'alfajores-avena-cacao',
+      name: 'Alfajores de Avena y Cacao',
+      price: 7.8,
+      calories: 170,
+      badge: 'Portátil',
+      emoji: '🥮',
+      tags: ['tradicional', 'energia', 'portable'],
+      flavor: 'Avena integral + cacao suave',
+      description: 'Formato pequeño, cómodo y con sabor familiar.',
+      benefits: ['Fáciles de llevar', 'Buen antojo sin culpa'],
+      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
+    },
+    {
+      id: 'torta-palta-cacao',
+      name: 'Torta de Palta y Cacao',
+      price: 14,
+      calories: 210,
+      badge: 'Keto',
+      emoji: '🥑',
+      tags: ['keto', 'intenso', 'energia'],
+      flavor: 'Palta madura + cacao oscuro',
+      description: 'Más cremosa, más intensa y con una personalidad marcada.',
+      benefits: ['Textura rica', 'Muy saciante'],
+      match: { diet: ['keto'], need: ['energia'], format: ['intenso'] },
+    },
+    {
+      id: 'pudin-cacao-avena',
+      name: 'Pudín de Cacao y Avena',
+      price: 9,
+      calories: 150,
+      badge: 'Ligero',
+      emoji: '🍮',
+      tags: ['vegano', 'fresco', 'portable'],
+      flavor: 'Cacao amargo + avena remojada',
+      description: 'Suave y práctico para quienes buscan algo liviano.',
+      benefits: ['Textura cremosa', 'Muy fácil de personalizar'],
+      match: { diet: ['vegano', 'sin gluten'], need: ['antiestres'], format: ['fresco', 'portable'] },
+    },
+    {
+      id: 'brownie-lucuma-nuez',
+      name: 'Brownie de Lúcuma y Nuez',
+      price: 9.8,
+      calories: 195,
+      badge: 'Peruano',
+      emoji: '🌰',
+      tags: ['keto', 'energia', 'concentracion'],
+      flavor: 'Lúcuma peruana + nuez tostada',
+      description: 'Un brownie con identidad local y energía estable.',
+      benefits: ['Toque peruano', 'Ideal para estudio'],
+      match: { diet: ['keto'], need: ['concentracion', 'energia'], format: ['portable'] },
+    },
   ];
 
   const QUESTIONS = [
@@ -93,6 +276,12 @@
     passwordForm: document.getElementById('passwordForm'),
     newPassword: document.getElementById('newPassword'),
     confirmPassword: document.getElementById('confirmPassword'),
+    orderConfirmationModal: document.getElementById('orderConfirmationModal'),
+    orderConfirmationCode: document.getElementById('orderConfirmationCode'),
+    orderConfirmationClassroom: document.getElementById('orderConfirmationClassroom'),
+    orderConfirmationTotal: document.getElementById('orderConfirmationTotal'),
+    orderConfirmationMessage: document.getElementById('orderConfirmationMessage'),
+    closeOrderConfirmationButton: document.getElementById('closeOrderConfirmationButton'),
     toast: document.getElementById('toast'),
     adminTodayOrders: document.getElementById('adminTodayOrders'),
     adminRevenue: document.getElementById('adminRevenue'),
@@ -100,6 +289,7 @@
     adminOrders: document.getElementById('adminOrders'),
     adminCatalog: document.getElementById('adminCatalog'),
     studentList: document.getElementById('studentList'),
+    classroomOptions: document.getElementById('classroomOptions'),
     resetDemoDataButton: document.getElementById('resetDemoDataButton'),
     bottomNavItems: Array.from(document.querySelectorAll('.bottom-nav__item')),
   };
@@ -118,7 +308,7 @@
       student: {
         answers: { diet: '', need: '', format: '' },
         selectedFilter: 'todos',
-        cart: [{ id: 'trufas-matcha', quantity: 1 }],
+        cart: [],
         profile: { daysActive: 12, healthySnacks: 27, avoidedCoffee: 9 },
       },
       orders: [],
@@ -140,7 +330,9 @@
           ...(parsed.student || {}),
           answers: { ...base.student.answers, ...((parsed.student && parsed.student.answers) || {}) },
           profile: { ...base.student.profile, ...((parsed.student && parsed.student.profile) || {}) },
-          cart: Array.isArray(parsed.student && parsed.student.cart) ? parsed.student.cart : base.student.cart,
+          cart: Array.isArray(parsed.student && parsed.student.cart)
+            ? (parsed.student.cart.length === 1 && parsed.student.cart[0] && parsed.student.cart[0].id === 'trufas-matcha' ? [] : parsed.student.cart)
+            : base.student.cart,
         },
         orders: Array.isArray(parsed.orders) ? parsed.orders : [],
       };
@@ -164,6 +356,35 @@
     toast.timer = setTimeout(() => el.toast.classList.remove('is-visible'), 2200);
   }
 
+  function normalizeValue(value) {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
+  }
+
+  function itemHasTag(item, tag) {
+    const normalizedTag = normalizeValue(tag);
+    return item.tags.some((entry) => normalizeValue(entry) === normalizedTag);
+  }
+
+  function itemMatchesAny(item, values) {
+    return values.some((value) => itemHasTag(item, value));
+  }
+
+  function getAnswerSeed() {
+    return Object.values(state.student.answers).map(normalizeValue).join('|');
+  }
+
+  function pickFromTopScorers(scoredItems, seed) {
+    if (!scoredItems.length) return CATALOG[0];
+    if (!seed) return scoredItems[0].item;
+    let hash = 0;
+    for (const character of seed) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
+    return scoredItems[hash % scoredItems.length].item;
+  }
+
   function profile() {
     if (!state.student.profile) state.student.profile = { daysActive: 12, healthySnacks: 27, avoidedCoffee: 9 };
     return state.student.profile;
@@ -175,15 +396,19 @@
 
   function recommendedProduct() {
     const answers = state.student.answers;
-    return CATALOG.map((item) => {
+    const scoredItems = CATALOG.map((item, index) => {
       let score = 0;
-      if (answers.diet && item.tags.includes(answers.diet)) score += 3;
-      if (answers.need && item.tags.includes(answers.need)) score += 4;
-      if (answers.format === 'portable' && item.tags.includes('energía')) score += 1;
-      if (answers.format === 'fresco' && item.tags.includes('fresco')) score += 2;
-      if (answers.format === 'intenso' && item.tags.includes('proteína')) score += 1;
-      return { item, score };
-    }).sort((a, b) => b.score - a.score)[0].item;
+      if (answers.diet && item.match.diet.some((value) => normalizeValue(value) === normalizeValue(answers.diet))) score += 5;
+      if (answers.need && item.match.need.some((value) => normalizeValue(value) === normalizeValue(answers.need))) score += 4;
+      if (answers.format && item.match.format.some((value) => normalizeValue(value) === normalizeValue(answers.format))) score += 3;
+      if (answers.need === 'concentracion' && itemMatchesAny(item, ['proteina', 'matcha', 'cacao'])) score += 1;
+      if (answers.need === 'energia' && itemMatchesAny(item, ['energia', 'maca', 'nuez', 'lucuma'])) score += 1;
+      if (answers.need === 'antiestres' && itemMatchesAny(item, ['fresco', 'chia', 'maracuya', 'limon'])) score += 1;
+      return { item, score, index };
+    }).sort((left, right) => right.score - left.score || left.index - right.index);
+    const topScore = scoredItems[0]?.score ?? 0;
+    const finalists = scoredItems.filter((entry) => entry.score === topScore);
+    return pickFromTopScorers(finalists, getAnswerSeed());
   }
 
   function setScreen(mode) {
@@ -216,6 +441,30 @@
   }
 
   function renderMatch() {
+    const isComplete = QUESTIONS.every((question) => state.student.answers[question.key]);
+    if (!isComplete) {
+      const preview = CATALOG[(profile().daysActive + profile().healthySnacks) % CATALOG.length];
+      el.matchName.textContent = 'Completa tu perfil para personalizar';
+      el.matchDescription.textContent = 'Responde las 3 preguntas para descubrir el postre que mejor encaja con tu momento, tu energía y tu formato ideal.';
+      el.matchTags.innerHTML = '<span>Quiz pendiente</span><span>Recomendación dinámica</span>';
+      el.matchPrice.textContent = money(preview.price);
+      el.matchCalories.textContent = `${preview.calories} kcal`;
+      el.matchVisual.style.background = {
+        'brownie-keto': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
+        'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
+        'queque-zanahoria-canela': 'linear-gradient(135deg, #ffcb93, #d96d37)',
+        'galletas-quinoa-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
+        'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
+        'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
+        'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
+        'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
+        'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
+        'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
+        'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
+        'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
+      }[preview.id] || 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
+      return;
+    }
     const match = recommendedProduct();
     el.matchName.textContent = match.name;
     el.matchDescription.textContent = match.description;
@@ -224,12 +473,17 @@
     el.matchTags.innerHTML = match.benefits.map((benefit) => `<span>${benefit}</span>`).join('');
     el.matchVisual.style.background = {
       'brownie-keto': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
+      'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
+      'queque-zanahoria-canela': 'linear-gradient(135deg, #ffcb93, #d96d37)',
+      'galletas-quinoa-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
       'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-      'galletas-avena': 'linear-gradient(135deg, #ffd65f, #ef9c3e)',
       'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-      'mousse-chia': 'linear-gradient(135deg, #bcead3, #76c68d)',
-      'tarta-limon': 'linear-gradient(135deg, #ffe78f, #ffb24d)',
-      'barritas-cacao': 'linear-gradient(135deg, #b2d7ff, #3ea2ff)',
+      'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
+      'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
+      'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
+      'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
+      'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
+      'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
     }[match.id] || 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
   }
 
@@ -239,6 +493,8 @@
       ['concentracion', 'Concentración'],
       ['energia', 'Energía sostenida'],
       ['keto', 'Keto'],
+      ['vegano', 'Vegano'],
+      ['fresco', 'Fresco'],
       ['tradicional', 'Tradicional'],
     ];
     el.menuFilters.innerHTML = filters.map(([value, label]) => `<button type="button" class="filter-pill ${selectedFilter === value ? 'is-selected' : ''}" data-filter="${value}">${label}</button>`).join('');
@@ -250,7 +506,9 @@
         renderMenu();
       });
     });
-    const visible = selectedFilter === 'todos' ? CATALOG : CATALOG.filter((item) => item.tags.includes(selectedFilter));
+    const visible = selectedFilter === 'todos'
+      ? CATALOG
+      : CATALOG.filter((item) => item.tags.some((tag) => normalizeValue(tag) === normalizeValue(selectedFilter)));
     el.menuGrid.innerHTML = visible.map((item) => `
       <article class="product-card">
         <div class="product-card__visual" data-emoji="${item.emoji}"></div>
@@ -305,7 +563,7 @@
     el.profileCalories.textContent = String(p.avoidedCoffee);
     el.savedPreferences.textContent = Object.values(state.student.answers).filter(Boolean).join(' · ') || 'Sin preferencias guardadas aún.';
     const cartCount = state.student.cart.reduce((sum, entry) => sum + entry.quantity, 0);
-    const energy = Math.min(100, 45 + cartCount * 8 + (recommendedProduct().tags.includes('energía') ? 8 : 0));
+    const energy = Math.min(100, 45 + cartCount * 8 + (itemHasTag(recommendedProduct(), 'energia') ? 8 : 0));
     el.energyScore.textContent = String(energy);
     el.energyBar.style.width = `${energy}%`;
     el.recommendationNote.textContent = cartCount ? `Tienes ${cartCount} snack${cartCount === 1 ? '' : 's'} listo${cartCount === 1 ? '' : 's'} para tu jornada.` : `Mantén el ritmo con ${recommendedProduct().name} para tu próxima clase.`;
@@ -330,12 +588,12 @@
         </div>
       </article>
     `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay pedidos todavía.</strong><p class="muted">Cuando un estudiante confirme un pedido aparecerá aquí.</p></div></article>';
-    el.adminCatalog.innerHTML = CATALOG.slice(0, 4).map((item) => `
+    el.adminCatalog.innerHTML = CATALOG.slice(0, 8).map((item) => `
       <article class="catalog-card"><div class="catalog-card__visual" data-emoji="${item.emoji}"></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>
     `).join('');
     el.studentList.innerHTML = `
       <article class="student-item"><div class="student-item__body"><div class="student-item__header"><strong>Alumno ${STUDENT_ID}</strong><span class="admin-chip">${state.users[STUDENT_ID].firstLogin ? 'Clave inicial activa' : 'Cuenta configurada'}</span></div><p class="student-item__meta">Preferencias actuales: ${Object.values(state.student.answers).filter(Boolean).join(' · ') || 'Sin preferencias guardadas aún.'}</p></div></article>
-      <article class="student-item"><div class="student-item__body"><strong>Pedidos con entrega de aula</strong><p class="student-item__meta">Formato validado: G503, C201, K607.</p></div></article>
+      <article class="student-item"><div class="student-item__body"><strong>Pedidos con entrega de aula</strong><p class="student-item__meta">Solo se aceptan aulas incluidas en aulas.csv.</p></div></article>
     `;
   }
 
@@ -388,10 +646,12 @@
     toast('Contraseña actualizada correctamente.');
   }
 
-  function submitOrder(event) {
+  async function submitOrder(event) {
     event.preventDefault();
-    const classroom = el.classroomInput.value.trim().toUpperCase();
-    if (!CLASSROOM_PATTERN.test(classroom)) { toast('Ingresa un aula válida en formato como G503, C201 o K607.'); el.classroomInput.focus(); return; }
+    await classroomCatalogPromise;
+    const classroom = normalizeClassroom(el.classroomInput.value);
+    if (!availableClassrooms.size) { toast('No se pudo cargar la lista de aulas disponibles. Recarga la página.'); return; }
+    if (!isAvailableClassroom(classroom)) { toast('Selecciona un aula disponible en la lista de la UPAO.'); el.classroomInput.focus(); return; }
     if (!state.student.cart.length) { toast('Tu carrito está vacío. Agrega al menos un producto.'); return; }
     const items = state.student.cart.map((entry) => {
       const item = CATALOG.find((product) => product.id === entry.id);
@@ -407,8 +667,21 @@
     renderAdmin();
     renderProfile();
     el.orderForm.reset();
+    openOrderConfirmation({ classroom, total: Number(total.toFixed(2)), orderId: state.orders[0].id });
     toast(`Pedido confirmado para ${classroom}.`);
     showView('home');
+  }
+
+  function openOrderConfirmation(order) {
+    el.orderConfirmationCode.textContent = order.orderId;
+    el.orderConfirmationClassroom.textContent = `Entrega en ${order.classroom}`;
+    el.orderConfirmationTotal.textContent = money(order.total);
+    el.orderConfirmationMessage.textContent = 'Tu pedido quedó registrado y se entregará en tu salón. El pago será presencial al recogerlo.';
+    el.orderConfirmationModal.classList.remove('is-hidden');
+  }
+
+  function closeOrderConfirmation() {
+    el.orderConfirmationModal.classList.add('is-hidden');
   }
 
   function resetDemo() {
@@ -428,14 +701,26 @@
   el.orderForm.addEventListener('submit', submitOrder);
   el.openChangePasswordButton.addEventListener('click', openPasswordModal);
   el.passwordModal.addEventListener('click', (event) => { if (event.target === el.passwordModal) closePasswordModal(); });
+  el.orderConfirmationModal.addEventListener('click', (event) => { if (event.target === el.orderConfirmationModal) closeOrderConfirmation(); });
+  el.closeOrderConfirmationButton.addEventListener('click', closeOrderConfirmation);
   el.resetDemoDataButton.addEventListener('click', resetDemo);
   el.bottomNavItems.forEach((item) => item.addEventListener('click', () => showView(item.dataset.view)));
 
-  renderQuestionnaire();
-  renderMatch();
-  renderMenu();
-  renderCart();
-  renderProfile();
-  renderAdmin();
-  setScreen(null);
+  classroomCatalogPromise
+    .then(() => {
+      renderClassroomCatalog();
+      el.classroomInput.setAttribute('list', 'classroomOptions');
+    })
+    .catch((error) => {
+      console.error(error);
+    })
+    .finally(() => {
+      renderQuestionnaire();
+      renderMatch();
+      renderMenu();
+      renderCart();
+      renderProfile();
+      renderAdmin();
+      setScreen(null);
+    });
 })();

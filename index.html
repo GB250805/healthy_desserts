@@ -140,13 +140,15 @@
         <form id="orderForm" class="form-stack" novalidate>
           <label class="field">
             <span>Aula / Salón</span>
-            <input id="classroomInput" name="classroomInput" type="text" inputmode="text" autocomplete="off" placeholder="G503" maxlength="4" required />
-            <small class="field-note">Ejemplos válidos: G503, C201, K607.</small>
+            <input id="classroomInput" name="classroomInput" type="text" inputmode="text" autocomplete="off" placeholder="Selecciona un aula" maxlength="4" list="classroomOptions" required />
+            <datalist id="classroomOptions"></datalist>
+            <small class="field-note">El aula debe existir en la lista disponible de la UPAO.</small>
           </label>
           <div class="summary-box">
             <div><span>Subtotal</span><strong id="subtotalValue">S/ 0.00</strong></div>
             <div class="summary-total"><span>Total</span><strong id="totalValue">S/ 0.00</strong></div>
           </div>
+          <p class="field-note">Pago presencial al recoger el pedido. No hay pasarela de pago.</p>
           <button class="button button--primary" type="submit">Confirmar pedido</button>
         </form>
       </section>
@@ -272,6 +274,21 @@
         </label>
         <button class="button button--primary" type="submit">Guardar contraseña</button>
       </form>
+    </div>
+  </div>
+
+  <div class="modal is-hidden" id="orderConfirmationModal" role="dialog" aria-modal="true" aria-labelledby="orderConfirmationTitle">
+    <div class="modal__panel confirmation-panel card card--highlight">
+      <div class="confirmation-mark" aria-hidden="true">✓</div>
+      <p class="eyebrow">Pedido confirmado</p>
+      <h2 id="orderConfirmationTitle">Tu pedido quedó registrado</h2>
+      <p class="muted" id="orderConfirmationMessage">Tu pedido será preparado para entrega en el salón indicado.</p>
+      <div class="confirmation-details">
+        <span id="orderConfirmationCode">HD-0000</span>
+        <span id="orderConfirmationClassroom">Entrega en G503</span>
+        <strong id="orderConfirmationTotal">S/ 0.00</strong>
+      </div>
+      <button class="button button--primary" id="closeOrderConfirmationButton" type="button">Continuar</button>
     </div>
   </div>
 
