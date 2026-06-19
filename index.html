@@ -242,6 +242,31 @@
     </div>
   </div>
 
+  <div class="modal is-hidden" id="registrationModal" role="dialog" aria-modal="true" aria-labelledby="registrationTitle">
+    <div class="modal__panel card">
+      <h2 id="registrationTitle">Registra tus datos</h2>
+      <p class="muted">Completa tus datos para finalizar el pedido.</p>
+      <form id="registrationForm" class="form-stack" novalidate>
+        <label class="field">
+          <span>Nombres</span>
+          <input id="regNombres" type="text" inputmode="text" autocomplete="given-name" placeholder="Ej: Juan Carlos" required />
+          <small class="field-note">Solo letras. No se permiten números ni símbolos.</small>
+        </label>
+        <label class="field">
+          <span>Apellidos</span>
+          <input id="regApellidos" type="text" inputmode="text" autocomplete="family-name" placeholder="Ej: Pérez Gómez" required />
+          <small class="field-note">Solo letras. No se permiten números ni símbolos.</small>
+        </label>
+        <label class="field">
+          <span>ID</span>
+          <input id="regId" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej: 000255928" maxlength="9" required />
+          <small class="field-note">Debe tener exactamente 9 dígitos.</small>
+        </label>
+        <button class="button button--primary" type="submit">Enviar</button>
+      </form>
+    </div>
+  </div>
+
   <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
 
   <script src="boot.js"></script>

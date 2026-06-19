@@ -491,12 +491,18 @@
     studentList: document.getElementById('studentList'),
     classroomOptions: document.getElementById('classroomOptions'),
     resetDemoDataButton: document.getElementById('resetDemoDataButton'),
+    registrationModal: document.getElementById('registrationModal'),
+    registrationForm: document.getElementById('registrationForm'),
+    regNombres: document.getElementById('regNombres'),
+    regApellidos: document.getElementById('regApellidos'),
+    regId: document.getElementById('regId'),
     bottomNavItems: Array.from(document.querySelectorAll('.bottom-nav__item')),
   };
 
   const state = loadState();
   let selectedFilter = state.student.selectedFilter || 'todos';
   let selectedView = 'home';
+  let pendingOrder = null;
 
   function defaultState() {
     return {
@@ -803,7 +809,7 @@
       <article class="order-card">
         <div class="order-card__body">
           <div class="order-card__header">
-            <div><strong>${order.id}</strong><p class="admin-order__meta">${order.classroom}</p></div>
+            <div><strong>${order.id}</strong><p class="admin-order__meta">${order.classroom}${order.buyer ? ` · ${order.buyer.nombres} ${order.buyer.apellidos} · ID: ${order.buyer.id}` : ''}</p></div>
             <span class="order-status order-status--${order.status}">${({ new: 'Nuevo', cooking: 'En preparación', ready: 'Listo', done: 'Entregado' })[order.status] || 'Nuevo'}</span>
           </div>
           <p class="admin-order__meta">${order.items.map((item) => `${item.quantity}x ${item.name}`).join(' · ')}</p>
@@ -843,7 +849,38 @@
       return { id: item.id, name: item.name, price: item.price, emoji: item.emoji, quantity: entry.quantity };
     });
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    state.orders.unshift({ id: `HD-${Date.now().toString(36).toUpperCase()}`, userId: null, classroom, status: 'new', createdAt: new Date().toISOString(), items, total: Number(total.toFixed(2)) });
+    pendingOrder = { classroom, items, total: Number(total.toFixed(2)) };
+    el.regNombres.value = '';
+    el.regApellidos.value = '';
+    el.regId.value = '';
+    el.registrationModal.classList.remove('is-hidden');
+    el.regNombres.focus();
+  }
+
+  function submitRegistration(event) {
+    event.preventDefault();
+    const nombres = el.regNombres.value.trim();
+    const apellidos = el.regApellidos.value.trim();
+    const id = el.regId.value.trim();
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    if (!nombres) { toast('Ingresa tus nombres.'); el.regNombres.focus(); return; }
+    if (!nameRegex.test(nombres)) { toast('Los nombres solo pueden contener letras.'); el.regNombres.focus(); return; }
+    if (!apellidos) { toast('Ingresa tus apellidos.'); el.regApellidos.focus(); return; }
+    if (!nameRegex.test(apellidos)) { toast('Los apellidos solo pueden contener letras.'); el.regApellidos.focus(); return; }
+    if (!/^\d{9}$/.test(id)) { toast('El ID debe tener exactamente 9 dígitos.'); el.regId.focus(); return; }
+    if (!pendingOrder) { toast('Error: no hay un pedido pendiente.'); return; }
+
+    const { classroom, items, total } = pendingOrder;
+    state.orders.unshift({
+      id: `HD-${Date.now().toString(36).toUpperCase()}`,
+      userId: null,
+      buyer: { nombres, apellidos, id },
+      classroom,
+      status: 'new',
+      createdAt: new Date().toISOString(),
+      items,
+      total,
+    });
     state.student.cart = [];
     profile().daysActive += 1;
     profile().healthySnacks += 1;
@@ -852,7 +889,9 @@
     renderAdmin();
     renderProfile();
     el.orderForm.reset();
-    openOrderConfirmation({ classroom, total: Number(total.toFixed(2)), orderId: state.orders[0].id });
+    pendingOrder = null;
+    el.registrationModal.classList.add('is-hidden');
+    openOrderConfirmation({ classroom, total, orderId: state.orders[0].id });
     toast(`Pedido confirmado para ${classroom}.`);
     showView('home');
   }
@@ -909,6 +948,7 @@
   el.orderForm.addEventListener('submit', submitOrder);
   el.orderConfirmationModal.addEventListener('click', (event) => { if (event.target === el.orderConfirmationModal) closeOrderConfirmation(); });
   el.closeOrderConfirmationButton.addEventListener('click', closeOrderConfirmation);
+  el.registrationForm.addEventListener('submit', submitRegistration);
   el.resetDemoDataButton.addEventListener('click', resetDemo);
   el.bottomNavItems.forEach((item) => item.addEventListener('click', () => showView(item.dataset.view)));
 
