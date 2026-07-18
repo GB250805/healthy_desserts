@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#2f8f46" />
-  <meta name="description" content="Healthy Desserts - prototipo mobile-first para estudiantes con recomendaciones personalizadas y pedidos mock." />
+  <meta name="theme-color" content="#0b0f19" />
+  <meta name="description" content="Healthy Desserts - postres saludables personalizados para estudiantes." />
   <title>Healthy Desserts</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,31 +12,26 @@
   <div class="app" id="appRoot">
     <main class="screen screen--app" id="studentScreen" aria-labelledby="studentHomeTitle">
       <header class="topbar">
-        <div>
-          <p class="eyebrow" id="studentGreeting">Hola</p>
-          <h1 id="studentHomeTitle">¿Qué te apetece hoy?</h1>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">H</span>
+          <span class="brand-name">Healthy Desserts</span>
         </div>
         <button class="text-button" id="goToAdminButton" type="button">Admin</button>
       </header>
 
-      <section class="card hero-panel card--highlight">
-        <div class="hero-copy">
-          <p class="mini-kicker">Energía saludable acumulada</p>
+      <section class="hero-panel glass">
+        <div>
+          <p class="mini-kicker" id="studentGreeting">Bienestar acumulado</p>
           <div class="score-row">
             <strong id="energyScore">0</strong>
-            <span>/100</span>
+            <span>/ 100</span>
           </div>
           <div class="progress-track" aria-hidden="true"><span id="energyBar"></span></div>
-          <p class="muted" id="recommendationNote">Mantén el ritmo con un snack que acompañe tu estudio.</p>
-        </div>
-        <div class="hero-ornament" aria-hidden="true">
-          <span></span>
-          <span></span>
-          <span></span>
+          <p id="recommendationNote">Responde la encuesta para descubrir tu postre ideal.</p>
         </div>
       </section>
 
-      <section class="card">
+      <section class="glass">
         <div class="section-header">
           <div>
             <p class="eyebrow">Personalizador</p>
@@ -54,13 +49,13 @@
         </div>
       </section>
 
-      <section class="card card--accent is-empty" id="matchCard" aria-live="polite">
+      <section class="glass is-empty" id="matchCard" aria-live="polite">
         <p class="eyebrow">Tu match</p>
         <div class="match-layout">
           <div class="match-visual" id="matchVisual" aria-hidden="true"></div>
           <div>
             <h2 id="matchName">Tu match aparecerá aquí</h2>
-            <p class="muted" id="matchDescription">Responde las 3 preguntas del personalizador para descubrir tu postre ideal.</p>
+            <p id="matchDescription" style="color:var(--text-secondary);font-size:0.85rem;line-height:1.45;margin:0 0 6px;">Responde las 3 preguntas del personalizador para descubrir tu postre ideal.</p>
             <div class="match-tags" id="matchTags"><span>Encuesta pendiente</span></div>
             <div class="price-row">
               <strong id="matchPrice">—</strong>
@@ -71,7 +66,7 @@
         <button class="button button--secondary" id="addMatchToCartButton" type="button" disabled>Añadir al carrito</button>
       </section>
 
-      <section class="card">
+      <section class="glass">
         <div class="section-header">
           <div>
             <p class="eyebrow">Menú inteligente</p>
@@ -83,7 +78,7 @@
         <div class="product-grid" id="menuGrid"></div>
       </section>
 
-      <section class="card is-hidden" id="cartSection">
+      <section class="glass is-hidden" id="cartSection">
         <div class="section-header">
           <div>
             <p class="eyebrow">Tu carrito</p>
@@ -127,9 +122,9 @@
 
     <main class="screen screen--app is-hidden" id="adminScreen" aria-labelledby="adminTitle">
       <header class="topbar">
-        <div>
-          <p class="eyebrow">Panel Admin</p>
-          <h1 id="adminTitle">Operación y pedidos</h1>
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">H</span>
+          <span class="brand-name">Healthy Desserts</span>
         </div>
         <button class="text-button" id="backToStoreButton" type="button">Tienda</button>
       </header>
@@ -149,7 +144,7 @@
         </article>
       </section>
 
-      <section class="card">
+      <section class="glass">
         <div class="section-header">
           <div>
             <p class="eyebrow">Pedidos</p>
@@ -160,7 +155,7 @@
         <div class="admin-orders" id="adminOrders"></div>
       </section>
 
-      <section class="card">
+      <section class="glass">
         <div class="section-header">
           <div>
             <p class="eyebrow">Catálogo</p>
@@ -170,7 +165,7 @@
         <div class="admin-catalog" id="adminCatalog"></div>
       </section>
 
-      <section class="card">
+      <section class="glass">
         <div class="section-header">
           <div>
             <p class="eyebrow">Usuarios</p>
@@ -183,9 +178,9 @@
   </div>
 
   <div class="modal is-hidden" id="adminPasswordModal" role="dialog" aria-modal="true" aria-labelledby="adminPasswordTitle">
-    <div class="modal__panel card">
+    <div class="modal__panel">
       <h2 id="adminPasswordTitle">Acceso Admin</h2>
-      <p class="muted" id="adminPasswordHint">Ingresa la contraseña para ver el panel de administración.</p>
+      <p style="color:var(--text-secondary);font-size:0.85rem;margin:0 0 16px;" id="adminPasswordHint">Ingresa la contraseña para ver el panel de administración.</p>
       <form id="adminPasswordForm" class="form-stack" novalidate>
         <label class="field">
           <span>Contraseña</span>
@@ -197,11 +192,11 @@
   </div>
 
   <div class="modal is-hidden" id="orderConfirmationModal" role="dialog" aria-modal="true" aria-labelledby="orderConfirmationTitle">
-    <div class="modal__panel confirmation-panel card card--highlight">
+    <div class="modal__panel confirmation-panel">
       <div class="confirmation-mark" aria-hidden="true">✓</div>
       <p class="eyebrow">Pedido confirmado</p>
       <h2 id="orderConfirmationTitle">Tu pedido quedó registrado</h2>
-      <p class="muted" id="orderConfirmationMessage">Tu pedido será preparado para entrega en el salón indicado.</p>
+      <p style="color:var(--text-secondary);font-size:0.85rem;" id="orderConfirmationMessage">Tu pedido será preparado para entrega en el salón indicado.</p>
       <div class="confirmation-details">
         <span id="orderConfirmationCode">HD-0000</span>
         <span id="orderConfirmationClassroom">Entrega en G503</span>
@@ -212,9 +207,9 @@
   </div>
 
   <div class="modal is-hidden" id="registrationModal" role="dialog" aria-modal="true" aria-labelledby="registrationTitle">
-    <div class="modal__panel card">
+    <div class="modal__panel">
       <h2 id="registrationTitle">Registra tus datos</h2>
-      <p class="muted">Completa tus datos para finalizar el pedido.</p>
+      <p style="color:var(--text-secondary);font-size:0.85rem;margin:0 0 16px;">Completa tus datos para finalizar el pedido.</p>
       <form id="registrationForm" class="form-stack" novalidate>
         <label class="field">
           <span>Nombres</span>
@@ -236,7 +231,7 @@
           <input id="regCelular" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: +51987654321" required oninput="this.value=this.value.replace(/[^\d+]/g,'')" />
           <small class="field-note">Solo números. Puedes anteponer el código de país con + (ej. +51).</small>
         </label>
-        <p class="field-note warning-note">Verifique bien sus datos porque servirán como identificador para la entrega/recojo del pedido.</p>
+        <p class="warning-note">Verifique bien sus datos porque servirán como identificador para la entrega/recojo del pedido.</p>
         <button class="button button--primary" type="submit">Enviar</button>
       </form>
     </div>
