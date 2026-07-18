@@ -282,6 +282,18 @@ input:focus {
   font-weight: 800;
 }
 
+.warning-note {
+  color: #b85c1a;
+  font-weight: 700;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(243, 181, 74, 0.12);
+  border-radius: 12px;
+  border: 1px solid rgba(243, 181, 74, 0.25);
+}
+
 .field-note {
   margin: -4px 0 0;
   font-size: 0.82rem;

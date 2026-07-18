@@ -530,6 +530,7 @@
     regNombres: document.getElementById('regNombres'),
     regApellidos: document.getElementById('regApellidos'),
     regId: document.getElementById('regId'),
+    regCelular: document.getElementById('regCelular'),
     bottomNavItems: Array.from(document.querySelectorAll('.bottom-nav__item')),
   };
 
@@ -537,6 +538,7 @@
   let selectedFilter = state.student.selectedFilter || 'todos';
   let selectedView = 'home';
   let pendingOrder = null;
+  let lastConfirmedBuyer = null;
   let adminLock = loadAdminLock();
   let adminLockCountdown = null;
 
@@ -805,7 +807,7 @@
             <div><strong>${order.id}</strong><p class="admin-order__meta">${order.classroom}${order.buyer ? ` · ${order.buyer.nombres} ${order.buyer.apellidos} · ID: ${order.buyer.id}` : ''}</p></div>
             <span class="order-status order-status--${order.status}">${({ new: 'Nuevo', cooking: 'En preparación', ready: 'Listo', done: 'Entregado' })[order.status] || 'Nuevo'}</span>
           </div>
-          <p class="admin-order__meta">${order.items.map((item) => `${item.quantity}x ${item.name}`).join(' · ')}</p>
+          <p class="admin-order__meta">${order.buyer ? `📞 ${order.buyer.celular}` : ''}${order.items.map((item) => ` · ${item.quantity}x ${item.name}`).join('')}</p>
           <div class="order-card__footer"><strong>${money(order.total)}</strong></div>
         </div>
       </article>
@@ -852,19 +854,25 @@
     const nombres = el.regNombres.value.trim();
     const apellidos = el.regApellidos.value.trim();
     const id = el.regId.value.trim();
+    const celular = el.regCelular.value.trim();
     const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/;
+    const phoneRegex = /^\+?\d+$/;
     if (!nombres) { toast('Ingresa tus nombres.'); el.regNombres.focus(); return; }
     if (!nameRegex.test(nombres)) { toast('Los nombres solo pueden contener letras.'); el.regNombres.focus(); return; }
     if (!apellidos) { toast('Ingresa tus apellidos.'); el.regApellidos.focus(); return; }
     if (!nameRegex.test(apellidos)) { toast('Los apellidos solo pueden contener letras.'); el.regApellidos.focus(); return; }
     if (!/^\d{9}$/.test(id)) { toast('El ID debe tener exactamente 9 dígitos.'); el.regId.focus(); return; }
+    if (!celular) { toast('Ingresa tu número de celular.'); el.regCelular.focus(); return; }
+    if (!phoneRegex.test(celular)) { toast('El celular solo puede contener números y opcionalmente + al inicio.'); el.regCelular.focus(); return; }
     if (!pendingOrder) { toast('Error: no hay un pedido pendiente.'); return; }
 
     const { classroom, items, total } = pendingOrder;
+    const buyer = { nombres, apellidos, id, celular };
+    lastConfirmedBuyer = buyer;
     state.orders.unshift({
       id: `HD-${Date.now().toString(36).toUpperCase()}`,
       userId: null,
-      buyer: { nombres, apellidos, id },
+      buyer,
       classroom,
       status: 'new',
       createdAt: new Date().toISOString(),
@@ -879,7 +887,7 @@
     el.orderForm.reset();
     pendingOrder = null;
     el.registrationModal.classList.add('is-hidden');
-    openOrderConfirmation({ classroom, total, orderId: state.orders[0].id });
+    openOrderConfirmation({ classroom, total, orderId: state.orders[0].id, nombres, id });
     toast(`Pedido confirmado para ${classroom}.`);
     showView('home');
   }
@@ -890,9 +898,16 @@
     el.orderConfirmationTotal.textContent = money(order.total);
     el.orderConfirmationMessage.textContent = 'Tu pedido quedó registrado y se entregará en tu salón. El pago será presencial al recogerlo.';
     el.orderConfirmationModal.classList.remove('is-hidden');
+    el.closeOrderConfirmationButton.dataset.nombres = order.nombres;
+    el.closeOrderConfirmationButton.dataset.id = order.id;
   }
 
   function closeOrderConfirmation() {
+    const nombres = el.closeOrderConfirmationButton.dataset.nombres;
+    const id = el.closeOrderConfirmationButton.dataset.id;
+    const mensaje = `Hola, soy ${nombres}, mi id es ${id} y confirmo mi pedido`;
+    const url = `https://wa.me/51967167272?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
     el.orderConfirmationModal.classList.add('is-hidden');
   }
 
