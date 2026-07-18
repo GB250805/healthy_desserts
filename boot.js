@@ -681,7 +681,7 @@
         saveState();
         renderQuestionnaire();
         renderMatch();
-        renderProfile();
+        renderHero();
       });
     });
   }
@@ -746,7 +746,7 @@
         if (existing) existing.quantity += 1; else state.student.cart.push({ id: button.dataset.add, quantity: 1 });
         saveState();
         renderCart();
-        renderProfile();
+        renderHero();
         toast('Producto agregado al carrito.');
       });
     });
@@ -776,7 +776,7 @@
     el.cartList.querySelectorAll('[data-remove]').forEach((button) => button.addEventListener('click', () => { state.student.cart = state.student.cart.filter((item) => item.id !== button.dataset.remove); saveState(); renderCart(); }));
   }
 
-  function renderProfile() {
+  function renderHero() {
     const cartCount = state.student.cart.reduce((sum, entry) => sum + entry.quantity, 0);
     const energy = Math.min(100, Math.max(0, cartCount * 8));
     el.energyScore.textContent = String(energy);
@@ -875,7 +875,7 @@
     saveState();
     renderCart();
     renderAdmin();
-    renderProfile();
+    renderHero();
     el.orderForm.reset();
     pendingOrder = null;
     el.registrationModal.classList.add('is-hidden');
@@ -971,7 +971,7 @@
   el.adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
   el.adminPasswordModal.addEventListener('click', (event) => { if (event.target === el.adminPasswordModal) closeAdminPasswordModal(); });
   el.backToStoreButton.addEventListener('click', () => { setScreen('student'); });
-  el.restartQuizButton.addEventListener('click', () => { state.student.answers = { diet: '', need: '', format: '' }; saveState(); renderQuestionnaire(); renderMatch(); renderProfile(); toast('Flujo reiniciado.'); });
+  el.restartQuizButton.addEventListener('click', () => { state.student.answers = { diet: '', need: '', format: '' }; saveState(); renderQuestionnaire(); renderMatch(); renderHero(); toast('Flujo reiniciado.'); });
   el.wizardNextButton.addEventListener('click', () => {
     const unanswered = QUESTIONS.find((question) => !state.student.answers[question.key]);
     if (unanswered) { toast('Selecciona una opción para continuar.'); return; }
@@ -986,7 +986,7 @@
     if (existing) existing.quantity += 1; else state.student.cart.push({ id: match.id, quantity: 1 });
     saveState();
     renderCart();
-    renderProfile();
+    renderHero();
     toast(`${match.name} añadido al carrito.`);
     showView('cart');
   });
@@ -1012,7 +1012,7 @@
       renderMatch();
       renderMenu();
       renderCart();
-      renderProfile();
+      renderHero();
       renderAdmin();
       setScreen('student');
     });
