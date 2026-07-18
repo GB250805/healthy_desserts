@@ -218,22 +218,22 @@
       <form id="registrationForm" class="form-stack" novalidate>
         <label class="field">
           <span>Nombres</span>
-          <input id="regNombres" type="text" inputmode="text" autocomplete="given-name" placeholder="Ej: Juan Carlos" required />
+          <input id="regNombres" type="text" inputmode="text" autocomplete="given-name" placeholder="Ej: Juan Carlos" required oninput="this.value=this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g,'')" />
           <small class="field-note">Solo letras. No se permiten números ni símbolos.</small>
         </label>
         <label class="field">
           <span>Apellidos</span>
-          <input id="regApellidos" type="text" inputmode="text" autocomplete="family-name" placeholder="Ej: Pérez Gómez" required />
+          <input id="regApellidos" type="text" inputmode="text" autocomplete="family-name" placeholder="Ej: Pérez Gómez" required oninput="this.value=this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g,'')" />
           <small class="field-note">Solo letras. No se permiten números ni símbolos.</small>
         </label>
         <label class="field">
           <span>ID</span>
-          <input id="regId" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej: 000255928" maxlength="9" required />
+          <input id="regId" type="text" inputmode="numeric" autocomplete="off" placeholder="Ej: 000255928" maxlength="9" required oninput="this.value=this.value.replace(/\D/g,'')" />
           <small class="field-note">Debe tener exactamente 9 dígitos.</small>
         </label>
         <label class="field">
           <span>Número de celular</span>
-          <input id="regCelular" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: +51987654321" required />
+          <input id="regCelular" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: +51987654321" required oninput="this.value=this.value.replace(/[^\d+]/g,'')" />
           <small class="field-note">Solo números. Puedes anteponer el código de país con + (ej. +51).</small>
         </label>
         <p class="field-note warning-note">Verifique bien sus datos porque servirán como identificador para la entrega/recojo del pedido.</p>
