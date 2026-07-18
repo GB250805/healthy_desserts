@@ -54,21 +54,21 @@
         </div>
       </section>
 
-      <section class="card card--accent" id="matchCard" aria-live="polite">
+      <section class="card card--accent is-empty" id="matchCard" aria-live="polite">
         <p class="eyebrow">Tu match</p>
         <div class="match-layout">
           <div class="match-visual" id="matchVisual" aria-hidden="true"></div>
           <div>
-            <h2 id="matchName">Brownie Keto Energizante</h2>
-            <p class="muted" id="matchDescription">Con cacao puro y nueces, ideal para vencer la fatiga mental.</p>
-            <div class="match-tags" id="matchTags"></div>
+            <h2 id="matchName">Tu match aparecerá aquí</h2>
+            <p class="muted" id="matchDescription">Responde las 3 preguntas del personalizador para descubrir tu postre ideal.</p>
+            <div class="match-tags" id="matchTags"><span>Encuesta pendiente</span></div>
             <div class="price-row">
-              <strong id="matchPrice">S/ 8.50</strong>
-              <span id="matchCalories">180 kcal</span>
+              <strong id="matchPrice">—</strong>
+              <span id="matchCalories"></span>
             </div>
           </div>
         </div>
-        <button class="button button--secondary" id="addMatchToCartButton" type="button">Añadir al carrito</button>
+        <button class="button button--secondary" id="addMatchToCartButton" type="button" disabled>Añadir al carrito</button>
       </section>
 
       <section class="card">
@@ -108,33 +108,6 @@
         </form>
       </section>
 
-      <section class="card is-hidden" id="profileSection">
-        <div class="section-header">
-          <div>
-            <p class="eyebrow">Perfil</p>
-            <h2>Tu progreso y configuración</h2>
-          </div>
-        </div>
-        <div class="profile-grid">
-          <article class="profile-stat">
-            <strong id="profileDays">0</strong>
-            <span>Días activos</span>
-          </article>
-          <article class="profile-stat">
-            <strong id="profileSnacks">0</strong>
-            <span>Snacks healthy</span>
-          </article>
-          <article class="profile-stat">
-            <strong id="profileCalories">0</strong>
-            <span>Café evitado</span>
-          </article>
-        </div>
-        <div class="profile-card">
-          <h3>Preferencias guardadas</h3>
-          <p id="savedPreferences">Personaliza tu experiencia para afinar recomendaciones futuras.</p>
-        </div>
-      </section>
-
       <nav class="bottom-nav" aria-label="Navegación principal">
         <button class="bottom-nav__item is-active" data-view="home" type="button">
           <span aria-hidden="true">⌂</span>
@@ -148,10 +121,6 @@
           <span aria-hidden="true">◔</span>
           <strong>Carrito</strong>
           <span class="badge" id="cartBadge">0</span>
-        </button>
-        <button class="bottom-nav__item" data-view="profile" type="button">
-          <span aria-hidden="true">◉</span>
-          <strong>Perfil</strong>
         </button>
       </nav>
     </main>
@@ -216,13 +185,13 @@
   <div class="modal is-hidden" id="adminPasswordModal" role="dialog" aria-modal="true" aria-labelledby="adminPasswordTitle">
     <div class="modal__panel card">
       <h2 id="adminPasswordTitle">Acceso Admin</h2>
-      <p class="muted">Ingresa la contraseña para ver el panel de administración.</p>
+      <p class="muted" id="adminPasswordHint">Ingresa la contraseña para ver el panel de administración.</p>
       <form id="adminPasswordForm" class="form-stack" novalidate>
         <label class="field">
           <span>Contraseña</span>
           <input id="adminPasswordInput" type="password" autocomplete="off" required />
         </label>
-        <button class="button button--primary" type="submit">Ingresar</button>
+        <button class="button button--primary" type="submit" id="adminPasswordSubmit">Ingresar</button>
       </form>
     </div>
   </div>

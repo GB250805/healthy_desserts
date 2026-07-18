@@ -403,6 +403,43 @@
     },
   ];
 
+  const DEFAULT_GRADIENT = 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
+
+  const MATCH_GRADIENTS = {
+    'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
+    'brownie-canihua': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
+    'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
+    'queque-zanahoria-andino': 'linear-gradient(135deg, #ffcb93, #d96d37)',
+    'galletas-quinoa-choco': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
+    'cheesecake-aguaymanto': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
+    'trufas-keto-amazonicas': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
+    'pudin-chia-camu': 'linear-gradient(135deg, #bcead3, #76c68d)',
+    'mousse-lucuma-vegano': 'linear-gradient(135deg, #c9f0d0, #39b676)',
+    'alfajores-kiwicha': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
+    'mazamorra-morada': 'linear-gradient(135deg, #d4b8e0, #7b4fa0)',
+    'volcan-chocolate': 'linear-gradient(135deg, #d8d0c8, #6b3a2a)',
+    'muffins-avena-arandanos': 'linear-gradient(135deg, #ffc8a2, #b06d8a)',
+    'cuadritos-almendras': 'linear-gradient(135deg, #f7d680, #b8863a)',
+    'turron-higos-vegano': 'linear-gradient(135deg, #d4a574, #7b4a2e)',
+    'tartaleta-fresas': 'linear-gradient(135deg, #ffb5b5, #e86a6a)',
+    'galleta-avena-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
+    'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
+    'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
+    'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
+    'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
+    'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
+    'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
+    'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
+    'galletas-kiwicha-chocolate': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
+    'queque-platano-canela': 'linear-gradient(135deg, #ffc8a2, #d96d37)',
+    'crema-volteada-fit': 'linear-gradient(135deg, #fff0a4, #f08f61)',
+    'helado-coco-maracuya': 'linear-gradient(135deg, #bcead3, #76c68d)',
+  };
+
+  function gradientFor(id) {
+    return MATCH_GRADIENTS[id] || DEFAULT_GRADIENT;
+  }
+
   const QUESTIONS = [
     {
       key: 'diet',
@@ -458,7 +495,6 @@
     cartList: document.getElementById('cartList'),
     cartBadge: document.getElementById('cartBadge'),
     cartSection: document.getElementById('cartSection'),
-    profileSection: document.getElementById('profileSection'),
     backToMenuButton: document.getElementById('backToMenuButton'),
     viewCartShortcut: document.getElementById('viewCartShortcut'),
     orderForm: document.getElementById('orderForm'),
@@ -469,13 +505,11 @@
     energyBar: document.getElementById('energyBar'),
     recommendationNote: document.getElementById('recommendationNote'),
     studentGreeting: document.getElementById('studentGreeting'),
-    profileDays: document.getElementById('profileDays'),
-    profileSnacks: document.getElementById('profileSnacks'),
-    profileCalories: document.getElementById('profileCalories'),
-    savedPreferences: document.getElementById('savedPreferences'),
     adminPasswordModal: document.getElementById('adminPasswordModal'),
     adminPasswordForm: document.getElementById('adminPasswordForm'),
     adminPasswordInput: document.getElementById('adminPasswordInput'),
+    adminPasswordSubmit: document.getElementById('adminPasswordSubmit'),
+    adminPasswordHint: document.getElementById('adminPasswordHint'),
     orderConfirmationModal: document.getElementById('orderConfirmationModal'),
     orderConfirmationCode: document.getElementById('orderConfirmationCode'),
     orderConfirmationClassroom: document.getElementById('orderConfirmationClassroom'),
@@ -503,6 +537,8 @@
   let selectedFilter = state.student.selectedFilter || 'todos';
   let selectedView = 'home';
   let pendingOrder = null;
+  let adminLock = loadAdminLock();
+  let adminLockCountdown = null;
 
   function defaultState() {
     return {
@@ -510,7 +546,6 @@
         answers: { diet: '', need: '', format: '' },
         selectedFilter: 'todos',
         cart: [],
-        profile: { daysActive: 0, healthySnacks: 0, avoidedCoffee: 0 },
       },
       orders: [],
     };
@@ -529,7 +564,6 @@
           ...base.student,
           ...(parsed.student || {}),
           answers: { ...base.student.answers, ...((parsed.student && parsed.student.answers) || {}) },
-          profile: { ...base.student.profile, ...((parsed.student && parsed.student.profile) || {}) },
           cart: Array.isArray(parsed.student && parsed.student.cart) ? parsed.student.cart : base.student.cart,
         },
         orders: Array.isArray(parsed.orders) ? parsed.orders : [],
@@ -541,6 +575,33 @@
 
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  const ADMIN_PASSWORD = '123456789';
+  const ADMIN_LOCK_KEY = 'healthy-desserts-admin-lock-v1';
+  const MAX_LOGIN_ATTEMPTS = 5;
+  const LOCKOUT_DURATION_MS = 60 * 1000;
+
+  function loadAdminLock() {
+    try {
+      const raw = localStorage.getItem(ADMIN_LOCK_KEY);
+      const parsed = raw ? JSON.parse(raw) : null;
+      return { attempts: Number(parsed?.attempts) || 0, lockUntil: Number(parsed?.lockUntil) || 0 };
+    } catch {
+      return { attempts: 0, lockUntil: 0 };
+    }
+  }
+
+  function saveAdminLock() {
+    localStorage.setItem(ADMIN_LOCK_KEY, JSON.stringify(adminLock));
+  }
+
+  function isAdminLocked() {
+    return adminLock.lockUntil > Date.now();
+  }
+
+  function remainingLockSeconds() {
+    return Math.max(0, Math.ceil((adminLock.lockUntil - Date.now()) / 1000));
   }
 
   function money(amount) {
@@ -562,46 +623,34 @@
       .replace(/[^a-z0-9]+/g, '');
   }
 
-  function itemHasTag(item, tag) {
-    const normalizedTag = normalizeValue(tag);
-    return item.tags.some((entry) => normalizeValue(entry) === normalizedTag);
-  }
-
-  function itemMatchesAny(item, values) {
-    return values.some((value) => itemHasTag(item, value));
-  }
-
   function getAnswerSeed() {
     return Object.values(state.student.answers).map(normalizeValue).join('|');
   }
 
   function pickFromTopScorers(scoredItems, seed) {
-    if (!scoredItems.length) return CATALOG[0];
+    if (!scoredItems.length) return null;
     if (!seed) return scoredItems[0].item;
     let hash = 0;
     for (const character of seed) hash = (hash * 31 + character.charCodeAt(0)) >>> 0;
     return scoredItems[hash % scoredItems.length].item;
   }
 
-  function profile() {
-    if (!state.student.profile) state.student.profile = { daysActive: 0, healthySnacks: 0, avoidedCoffee: 0 };
-    return state.student.profile;
-  }
-
   function currentQuestionIndex() {
     return QUESTIONS.findIndex((q) => !state.student.answers[q.key]);
   }
 
+  function hasCompletedQuiz() {
+    return QUESTIONS.every((question) => state.student.answers[question.key]);
+  }
+
   function recommendedProduct() {
+    if (!hasCompletedQuiz()) return null;
     const answers = state.student.answers;
     const scoredItems = CATALOG.map((item, index) => {
       let score = 0;
-      if (answers.diet && item.match.diet.some((value) => normalizeValue(value) === normalizeValue(answers.diet))) score += 5;
-      if (answers.need && item.match.need.some((value) => normalizeValue(value) === normalizeValue(answers.need))) score += 4;
-      if (answers.format && item.match.format.some((value) => normalizeValue(value) === normalizeValue(answers.format))) score += 3;
-      if (answers.need === 'concentracion' && itemMatchesAny(item, ['proteina', 'matcha', 'cacao'])) score += 1;
-      if (answers.need === 'energia' && itemMatchesAny(item, ['energia', 'maca', 'nuez', 'lucuma'])) score += 1;
-      if (answers.need === 'antiestres' && itemMatchesAny(item, ['fresco', 'chia', 'maracuya', 'limon'])) score += 1;
+      if (item.match.diet.some((value) => normalizeValue(value) === normalizeValue(answers.diet))) score += 5;
+      if (item.match.need.some((value) => normalizeValue(value) === normalizeValue(answers.need))) score += 4;
+      if (item.match.format.some((value) => normalizeValue(value) === normalizeValue(answers.format))) score += 3;
       return { item, score, index };
     }).sort((left, right) => right.score - left.score || left.index - right.index);
     const topScore = scoredItems[0]?.score ?? 0;
@@ -638,82 +687,24 @@
   }
 
   function renderMatch() {
-    const isComplete = QUESTIONS.every((question) => state.student.answers[question.key]);
-    if (!isComplete) {
-      const preview = CATALOG[(profile().daysActive + profile().healthySnacks + 1) % CATALOG.length];
-      el.matchName.textContent = 'Completa tu perfil para personalizar';
-      el.matchDescription.textContent = 'Responde las 3 preguntas para descubrir el postre que mejor encaja con tu momento, tu energía y tu formato ideal.';
-      el.matchTags.innerHTML = '<span>Quiz pendiente</span><span>Recomendación dinámica</span>';
-      el.matchPrice.textContent = money(preview.price);
-      el.matchCalories.textContent = `${preview.calories} kcal`;
-      el.matchVisual.style.background = {
-        'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-        'brownie-canihua': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
-        'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-        'queque-zanahoria-andino': 'linear-gradient(135deg, #ffcb93, #d96d37)',
-        'galletas-quinoa-choco': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-        'cheesecake-aguaymanto': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-        'trufas-keto-amazonicas': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-        'pudin-chia-camu': 'linear-gradient(135deg, #bcead3, #76c68d)',
-        'mousse-lucuma-vegano': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-        'alfajores-kiwicha': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-        'mazamorra-morada': 'linear-gradient(135deg, #d4b8e0, #7b4fa0)',
-        'volcan-chocolate': 'linear-gradient(135deg, #d8d0c8, #6b3a2a)',
-        'muffins-avena-arandanos': 'linear-gradient(135deg, #ffc8a2, #b06d8a)',
-        'cuadritos-almendras': 'linear-gradient(135deg, #f7d680, #b8863a)',
-        'turron-higos-vegano': 'linear-gradient(135deg, #d4a574, #7b4a2e)',
-        'tartaleta-fresas': 'linear-gradient(135deg, #ffb5b5, #e86a6a)',
-        'galleta-avena-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-        'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-        'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
-        'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-        'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
-        'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-        'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-        'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
-        'galletas-kiwicha-chocolate': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-        'queque-platano-canela': 'linear-gradient(135deg, #ffc8a2, #d96d37)',
-        'crema-volteada-fit': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-        'helado-coco-maracuya': 'linear-gradient(135deg, #bcead3, #76c68d)',
-      }[preview.id] || 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
+    const match = recommendedProduct();
+    el.matchCard.classList.toggle('is-empty', !match);
+    el.addMatchToCartButton.disabled = !match;
+    if (!match) {
+      el.matchName.textContent = 'Tu match aparecerá aquí';
+      el.matchDescription.textContent = 'Responde las 3 preguntas del personalizador para descubrir el postre que mejor encaja con tu dieta, tu necesidad de hoy y tu formato ideal.';
+      el.matchTags.innerHTML = '<span>Encuesta pendiente</span>';
+      el.matchPrice.textContent = '—';
+      el.matchCalories.textContent = '';
+      el.matchVisual.style.background = 'transparent';
       return;
     }
-    const match = recommendedProduct();
     el.matchName.textContent = match.name;
     el.matchDescription.textContent = match.description;
     el.matchPrice.textContent = money(match.price);
     el.matchCalories.textContent = `${match.calories} kcal`;
     el.matchTags.innerHTML = match.benefits.map((benefit) => `<span>${benefit}</span>`).join('');
-    el.matchVisual.style.background = {
-      'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-      'brownie-canihua': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
-      'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-      'queque-zanahoria-andino': 'linear-gradient(135deg, #ffcb93, #d96d37)',
-      'galletas-quinoa-choco': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-      'cheesecake-aguaymanto': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-      'trufas-keto-amazonicas': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-      'pudin-chia-camu': 'linear-gradient(135deg, #bcead3, #76c68d)',
-      'mousse-lucuma-vegano': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-      'alfajores-kiwicha': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-      'mazamorra-morada': 'linear-gradient(135deg, #d4b8e0, #7b4fa0)',
-      'volcan-chocolate': 'linear-gradient(135deg, #d8d0c8, #6b3a2a)',
-      'muffins-avena-arandanos': 'linear-gradient(135deg, #ffc8a2, #b06d8a)',
-      'cuadritos-almendras': 'linear-gradient(135deg, #f7d680, #b8863a)',
-      'turron-higos-vegano': 'linear-gradient(135deg, #d4a574, #7b4a2e)',
-      'tartaleta-fresas': 'linear-gradient(135deg, #ffb5b5, #e86a6a)',
-      'galleta-avena-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-      'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-      'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
-      'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-      'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
-      'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-      'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-      'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
-      'galletas-kiwicha-chocolate': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-      'queque-platano-canela': 'linear-gradient(135deg, #ffc8a2, #d96d37)',
-      'crema-volteada-fit': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-      'helado-coco-maracuya': 'linear-gradient(135deg, #bcead3, #76c68d)',
-    }[match.id] || 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
+    el.matchVisual.style.background = gradientFor(match.id);
   }
 
   function renderMenu() {
@@ -740,7 +731,7 @@
       : CATALOG.filter((item) => item.tags.some((tag) => normalizeValue(tag) === normalizeValue(selectedFilter)));
     el.menuGrid.innerHTML = visible.map((item) => `
       <article class="product-card">
-        <div class="product-card__visual" data-emoji="${item.emoji}"></div>
+        <div class="product-card__visual" data-emoji="${item.emoji}" style="background:${gradientFor(item.id)}"></div>
         <div class="product-card__body">
           <span class="product-chip">${item.badge}</span>
           <strong>${item.name}</strong>
@@ -786,16 +777,18 @@
   }
 
   function renderProfile() {
-    const p = profile();
-    el.profileDays.textContent = String(p.daysActive);
-    el.profileSnacks.textContent = String(p.healthySnacks);
-    el.profileCalories.textContent = String(p.avoidedCoffee);
-    el.savedPreferences.textContent = Object.values(state.student.answers).filter(Boolean).join(' · ') || 'Sin preferencias guardadas aún.';
     const cartCount = state.student.cart.reduce((sum, entry) => sum + entry.quantity, 0);
     const energy = Math.min(100, Math.max(0, cartCount * 8));
     el.energyScore.textContent = String(energy);
     el.energyBar.style.width = `${energy}%`;
-    el.recommendationNote.textContent = cartCount ? `Tienes ${cartCount} snack${cartCount === 1 ? '' : 's'} listo${cartCount === 1 ? '' : 's'} para tu jornada.` : `Mantén el ritmo con ${recommendedProduct().name} para tu próxima clase.`;
+    const match = recommendedProduct();
+    if (cartCount) {
+      el.recommendationNote.textContent = `Tienes ${cartCount} snack${cartCount === 1 ? '' : 's'} listo${cartCount === 1 ? '' : 's'} para tu jornada.`;
+    } else if (match) {
+      el.recommendationNote.textContent = `Mantén el ritmo con ${match.name} para tu próxima clase.`;
+    } else {
+      el.recommendationNote.textContent = 'Responde la encuesta para descubrir tu postre ideal.';
+    }
     el.studentGreeting.textContent = 'Hola, estudiante';
   }
 
@@ -818,7 +811,7 @@
       </article>
     `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay pedidos todavía.</strong><p class="muted">Cuando un estudiante confirme un pedido aparecerá aquí.</p></div></article>';
     el.adminCatalog.innerHTML = CATALOG.slice(0, 8).map((item) => `
-      <article class="catalog-card"><div class="catalog-card__visual" data-emoji="${item.emoji}"></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>
+      <article class="catalog-card"><div class="catalog-card__visual" data-emoji="${item.emoji}" style="background:${gradientFor(item.id)}"></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>
     `).join('');
     el.studentList.innerHTML = `
       <article class="student-item"><div class="student-item__body"><strong>Tienda abierta</strong><p class="student-item__meta">Cualquier persona puede pedir sin necesidad de cuenta.</p></div></article>
@@ -829,12 +822,9 @@
   function showView(view) {
     selectedView = view;
     el.cartSection.classList.toggle('is-hidden', view !== 'cart');
-    el.profileSection.classList.toggle('is-hidden', view !== 'profile');
-    el.matchCard.classList.toggle('is-hidden', view === 'profile');
     el.bottomNavItems.forEach((item) => item.classList.toggle('is-active', item.dataset.view === view));
     if (view === 'menu') el.menuGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if (view === 'cart') el.cartSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (view === 'profile') el.profileSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   async function submitOrder(event) {
@@ -882,8 +872,6 @@
       total,
     });
     state.student.cart = [];
-    profile().daysActive += 1;
-    profile().healthySnacks += 1;
     saveState();
     renderCart();
     renderAdmin();
@@ -913,25 +901,68 @@
     location.reload();
   }
 
+  function updateAdminPasswordHint() {
+    if (isAdminLocked()) {
+      el.adminPasswordHint.textContent = `Demasiados intentos fallidos. Intenta de nuevo en ${remainingLockSeconds()}s.`;
+      el.adminPasswordInput.disabled = true;
+      el.adminPasswordSubmit.disabled = true;
+      return;
+    }
+    el.adminPasswordInput.disabled = false;
+    el.adminPasswordSubmit.disabled = false;
+    el.adminPasswordHint.textContent = adminLock.attempts > 0
+      ? `Contraseña incorrecta. Intentos restantes: ${MAX_LOGIN_ATTEMPTS - adminLock.attempts}.`
+      : 'Ingresa la contraseña para ver el panel de administración.';
+  }
+
+  function startAdminLockCountdown() {
+    clearInterval(adminLockCountdown);
+    adminLockCountdown = null;
+    updateAdminPasswordHint();
+    if (!isAdminLocked()) return;
+    adminLockCountdown = setInterval(() => {
+      if (!isAdminLocked()) { clearInterval(adminLockCountdown); adminLockCountdown = null; }
+      updateAdminPasswordHint();
+    }, 1000);
+  }
+
   function openAdminPasswordModal() {
     el.adminPasswordInput.value = '';
     el.adminPasswordModal.classList.remove('is-hidden');
-    el.adminPasswordInput.focus();
+    startAdminLockCountdown();
+    if (!isAdminLocked()) el.adminPasswordInput.focus();
   }
 
   function closeAdminPasswordModal() {
     el.adminPasswordModal.classList.add('is-hidden');
+    clearInterval(adminLockCountdown);
+    adminLockCountdown = null;
   }
 
   function handleAdminPasswordSubmit(event) {
     event.preventDefault();
-    if (el.adminPasswordInput.value.trim() === '123456789') {
+    if (isAdminLocked()) { updateAdminPasswordHint(); return; }
+    if (el.adminPasswordInput.value.trim() === ADMIN_PASSWORD) {
+      adminLock = { attempts: 0, lockUntil: 0 };
+      saveAdminLock();
       closeAdminPasswordModal();
       setScreen('admin');
       renderAdmin();
+      return;
+    }
+    adminLock.attempts += 1;
+    if (adminLock.attempts >= MAX_LOGIN_ATTEMPTS) {
+      adminLock.attempts = 0;
+      adminLock.lockUntil = Date.now() + LOCKOUT_DURATION_MS;
+    }
+    saveAdminLock();
+    el.adminPasswordInput.value = '';
+    if (isAdminLocked()) {
+      toast('Demasiados intentos fallidos. Acceso bloqueado temporalmente.');
+      startAdminLockCountdown();
     } else {
       toast('Contraseña incorrecta.');
-      el.adminPasswordInput.value = '';
+      updateAdminPasswordHint();
       el.adminPasswordInput.focus();
     }
   }
@@ -941,8 +972,24 @@
   el.adminPasswordModal.addEventListener('click', (event) => { if (event.target === el.adminPasswordModal) closeAdminPasswordModal(); });
   el.backToStoreButton.addEventListener('click', () => { setScreen('student'); });
   el.restartQuizButton.addEventListener('click', () => { state.student.answers = { diet: '', need: '', format: '' }; saveState(); renderQuestionnaire(); renderMatch(); renderProfile(); toast('Flujo reiniciado.'); });
-  el.wizardNextButton.addEventListener('click', () => { const unanswered = QUESTIONS.find((question) => !state.student.answers[question.key]); if (unanswered) { toast('Selecciona una opción para continuar.'); return; } toast(`Tu match es ${recommendedProduct().name}.`); el.matchCard.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-  el.addMatchToCartButton.addEventListener('click', () => { const match = recommendedProduct(); const existing = state.student.cart.find((entry) => entry.id === match.id); if (existing) existing.quantity += 1; else state.student.cart.push({ id: match.id, quantity: 1 }); saveState(); renderCart(); renderProfile(); toast(`${match.name} añadido al carrito.`); showView('cart'); });
+  el.wizardNextButton.addEventListener('click', () => {
+    const unanswered = QUESTIONS.find((question) => !state.student.answers[question.key]);
+    if (unanswered) { toast('Selecciona una opción para continuar.'); return; }
+    const match = recommendedProduct();
+    if (match) toast(`Tu match es ${match.name}.`);
+    el.matchCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  el.addMatchToCartButton.addEventListener('click', () => {
+    const match = recommendedProduct();
+    if (!match) return;
+    const existing = state.student.cart.find((entry) => entry.id === match.id);
+    if (existing) existing.quantity += 1; else state.student.cart.push({ id: match.id, quantity: 1 });
+    saveState();
+    renderCart();
+    renderProfile();
+    toast(`${match.name} añadido al carrito.`);
+    showView('cart');
+  });
   el.viewCartShortcut.addEventListener('click', () => showView('cart'));
   el.backToMenuButton.addEventListener('click', () => showView('menu'));
   el.orderForm.addEventListener('submit', submitOrder);
