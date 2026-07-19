@@ -64,6 +64,8 @@ img {
 .app {
   width: 100%;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ===================================================================
@@ -71,7 +73,6 @@ img {
    =================================================================== */
 .screen {
   width: 100%;
-  min-height: 100vh;
   padding: 0 16px 90px;
 }
 
@@ -130,7 +131,7 @@ img {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: linear-gradient(180deg, var(--bg) 60%, transparent);
+  background: var(--bg);
 }
 
 .brand {
@@ -1266,8 +1267,8 @@ input:focus {
 
 .app-footer {
   max-width: 760px;
-  margin: 0 auto;
-  padding: 24px 16px 80px;
+  margin: 200px auto 0;
+  padding: 0 16px 100px;
   text-align: center;
 }
 
