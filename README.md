@@ -21,6 +21,7 @@ Prototipo web mobile-first para estudiantes, construido con HTML, CSS y JavaScri
 - `boot.js`: toda la lógica en una IIFE.
 - `aulas.csv`: códigos de aula válidos (UPAO), cargados vía `fetch`.
 - `Data.csv`: documento de referencia — **no se usa en tiempo de ejecución**.
+- `pics/`: 28 imágenes de los postres nombradas según cada producto.
 
 ## Uso
 
@@ -53,3 +54,4 @@ El mensaje es editable por el usuario antes de enviar.
 - `aulas.csv` se carga vía `fetch` con `cache: 'no-store'`. Usar servidor HTTP local (ej. `npx serve .` o VS Code Live Server).
 - Estado persistido en `localStorage` bajo la clave `healthy-desserts-clean-state-v1`.
 - `Data.csv` es documento de referencia — el catálogo real está en `CATALOG` dentro de `boot.js`.
+- Las imágenes de los postres están en `pics/` y se resuelven mediante `IMAGE_FILES` en `boot.js` según el `id` del producto.
