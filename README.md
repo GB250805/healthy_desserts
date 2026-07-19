@@ -18,7 +18,8 @@ Prototipo web mobile-first para estudiantes, construido con HTML, CSS y JavaScri
 
 - `index.html`: interfaz principal con todas las pantallas y modales.
 - `styles.css`: sistema visual mobile-first sin framework.
-- `boot.js`: toda la lógica en una IIFE.
+- `boot.js`: toda la lógica en una IIFE asíncrona.
+- `products.json`: catálogo de 28 productos con nombre, precio, calorías, tags, match y ruta de imagen.
 - `aulas.csv`: códigos de aula válidos (UPAO), cargados vía `fetch`.
 - `Data.csv`: documento de referencia — **no se usa en tiempo de ejecución**.
 - `pics/`: 28 imágenes de los postres nombradas según cada producto.
@@ -51,7 +52,8 @@ El mensaje es editable por el usuario antes de enviar.
 ## Notas técnicas
 
 - Sin build tools, sin dependencias, sin `package.json`.
-- `aulas.csv` se carga vía `fetch` con `cache: 'no-store'`. Usar servidor HTTP local (ej. `npx serve .` o VS Code Live Server).
+- `aulas.csv` y `products.json` se cargan vía `fetch` con `cache: 'no-store'`. Usar servidor HTTP local (ej. `npx serve .` o VS Code Live Server).
 - Estado persistido en `localStorage` bajo la clave `healthy-desserts-clean-state-v1`.
-- `Data.csv` es documento de referencia — el catálogo real está en `CATALOG` dentro de `boot.js`.
-- Las imágenes de los postres están en `pics/` y se resuelven mediante `IMAGE_FILES` en `boot.js` según el `id` del producto.
+- `Data.csv` es documento de referencia — el catálogo real está en `products.json`.
+- Las imágenes de los postres están en `pics/` y se resuelven desde el campo `image` de cada producto en `products.json`.
+- Al cargar la página, el estado del estudiante (carrito, personalizador, match) se reinicia automáticamente. El historial de pedidos del admin se conserva.

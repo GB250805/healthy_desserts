@@ -1,0 +1,844 @@
+[
+  {
+    "id": "barras-maca-cacao",
+    "name": "Barras de Maca, Algarrobina y Cacao",
+    "price": 7,
+    "calories": 165,
+    "badge": "Energía limpia",
+    "tags": [
+      "vegano",
+      "concentracion",
+      "portable"
+    ],
+    "flavor": "Maca andina + algarrobina + nibs de cacao",
+    "description": "Barra nutritiva con superalimentos andinos para enfoque mental sostenido.",
+    "benefits": [
+      "Energía natural",
+      "Enfoque sostenido"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "barras de maca.png"
+  },
+  {
+    "id": "brownie-canihua",
+    "name": "Brownie Proteico de Cañihua",
+    "price": 9,
+    "calories": 180,
+    "badge": "Sin gluten",
+    "tags": [
+      "sin gluten",
+      "concentracion",
+      "intenso"
+    ],
+    "flavor": "Cañihua andina + whey vegetal + cacao chuncho",
+    "description": "Brownie denso en proteínas para recuperar energía sin gluten.",
+    "benefits": [
+      "Alta proteína",
+      "Sin gluten"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "brownie proteico de cañihua.png"
+  },
+  {
+    "id": "pie-limon-proteico",
+    "name": "Pie de Limón Proteico",
+    "price": 9,
+    "calories": 185,
+    "badge": "Fresco",
+    "tags": [
+      "keto",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Limón peruano + crema ligera alta en proteína",
+    "description": "Un clásico renovado para una pausa ligera y balanceada.",
+    "benefits": [
+      "Sabor cítrico",
+      "Postre de media tarde"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "pie de limon proteico.png"
+  },
+  {
+    "id": "queque-zanahoria-andino",
+    "name": "Queque de Zanahoria Andino",
+    "price": 7,
+    "calories": 220,
+    "badge": "Casero",
+    "tags": [
+      "tradicional",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Zanahoria, nueces, chía y harina integral",
+    "description": "Denso, aromático y cómodo para acompañar la jornada.",
+    "benefits": [
+      "Sensación casera",
+      "Buen snack de ruta"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "queque de zanahoria andino.png"
+  },
+  {
+    "id": "galletas-quinoa-choco",
+    "name": "Galletas de Quinoa Choco-Chips",
+    "price": 7.5,
+    "calories": 160,
+    "badge": "Sin gluten",
+    "tags": [
+      "sin gluten",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Quinoa pop + harina de almendras + chocolate 70%",
+    "description": "Crujientes y nutritivas, pensadas para llevar sin complicaciones.",
+    "benefits": [
+      "Toque local",
+      "Textura crocante"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "galletas de quinoa choco-chips.png"
+  },
+  {
+    "id": "cheesecake-aguaymanto",
+    "name": "Cheesecake Light de Aguaymanto",
+    "price": 10,
+    "calories": 175,
+    "badge": "Light",
+    "tags": [
+      "sin gluten",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Queso crema bajo en grasa + mermelada de aguaymanto",
+    "description": "Suave, cremoso y endulzado naturalmente para consentirte sin culpa.",
+    "benefits": [
+      "Antioxidante natural",
+      "Bajo en grasa"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "cheesecake light de aguaymanto.png"
+  },
+  {
+    "id": "trufas-keto-amazonicas",
+    "name": "Trufas Keto Amazónicas",
+    "price": 8.5,
+    "calories": 140,
+    "badge": "Keto",
+    "tags": [
+      "keto",
+      "concentracion",
+      "intenso"
+    ],
+    "flavor": "Palta cremosa + cacao oscuro + coco rallado",
+    "description": "Bomba de grasas saludables en un bocado concentrado y delicioso.",
+    "benefits": [
+      "Alta saciedad",
+      "Enfoque mental"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "trufas keto amazónicas.png"
+  },
+  {
+    "id": "pudin-chia-camu",
+    "name": "Pudín de Chía y Camu Camu",
+    "price": 8,
+    "calories": 140,
+    "badge": "Vegano",
+    "tags": [
+      "vegano",
+      "energia",
+      "fresco"
+    ],
+    "flavor": "Leche de almendras + chía + coulis de camu camu",
+    "description": "Fresco, cítrico y cargado de vitamina C para empezar con vitalidad.",
+    "benefits": [
+      "Vitamina C natural",
+      "Digestión ligera"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "pudín de chía y camu camu.png"
+  },
+  {
+    "id": "mousse-lucuma-vegano",
+    "name": "Mousse Vegano de Lúcuma",
+    "price": 10,
+    "calories": 155,
+    "badge": "Vegano",
+    "tags": [
+      "vegano",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Castañas licuadas + pulpa de lúcuma + leche de coco",
+    "description": "Crema suave y dulce natural que calma el antojo sin remordimientos.",
+    "benefits": [
+      "Sabor peruano",
+      "Textura aterciopelada"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "mousse vegano de lúcuma.png"
+  },
+  {
+    "id": "alfajores-kiwicha",
+    "name": "Alfajores de Kiwicha",
+    "price": 7,
+    "calories": 170,
+    "badge": "Tradicional",
+    "tags": [
+      "tradicional",
+      "antiestres",
+      "portable"
+    ],
+    "flavor": "Harina de kiwicha + manjar blanco de dátiles",
+    "description": "Dos galletas de kiwicha abrazando un relleno cremoso y natural.",
+    "benefits": [
+      "Bocado familiar",
+      "Energía rápida"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "alfajores de kiwicha.png"
+  },
+  {
+    "id": "mazamorra-morada",
+    "name": "Copa de Mazamorra Morada Fit",
+    "price": 5.5,
+    "calories": 145,
+    "badge": "Fit",
+    "tags": [
+      "sin gluten",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Maíz morado + stevia + harina de camote",
+    "description": "Tradición peruana reinventada sin azúcar para un antojo ligero.",
+    "benefits": [
+      "Antioxidante",
+      "Tradición fit"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "copa de mazamorra morada fit.png"
+  },
+  {
+    "id": "volcan-chocolate",
+    "name": "Volcán de Chocolate al 80%",
+    "price": 11,
+    "calories": 175,
+    "badge": "Intenso",
+    "tags": [
+      "keto",
+      "antiestres",
+      "intenso"
+    ],
+    "flavor": "Harina de coco + eritritol + cacao puro derretido",
+    "description": "Explosión de chocolate oscuro con centro fundido para los más intensos.",
+    "benefits": [
+      "Antioxidante puro",
+      "Sin azúcar"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "volcán de chocolate al 80%.png"
+  },
+  {
+    "id": "muffins-avena-arandanos",
+    "name": "Muffins de Avena y Arándanos",
+    "price": 6.5,
+    "calories": 175,
+    "badge": "Energético",
+    "tags": [
+      "tradicional",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Harina de avena + plátano seda + arándanos frescos",
+    "description": "Espectaculares muffins húmedos y frutales para una dosis de energía limpia.",
+    "benefits": [
+      "Fruta natural",
+      "Dulzor justo"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "muffins de avena y arándanos.png"
+  },
+  {
+    "id": "cuadritos-almendras",
+    "name": "Cuadritos de Almendras y Sal de Maras",
+    "price": 8.5,
+    "calories": 195,
+    "badge": "Keto",
+    "tags": [
+      "keto",
+      "concentracion",
+      "portable"
+    ],
+    "flavor": "Mantequilla de almendras + aceite de coco + sal de Maras",
+    "description": "Cuadrito crujiente y salado que mantiene el enfoque sin carbohidratos.",
+    "benefits": [
+      "Alta saciedad",
+      "Electrolitos naturales"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "cuadritos de almendras y sal de Maras.png"
+  },
+  {
+    "id": "turron-higos-vegano",
+    "name": "Turrón Crudi-Vegano de Higos",
+    "price": 9,
+    "calories": 180,
+    "badge": "Crudi-vegano",
+    "tags": [
+      "vegano",
+      "energia",
+      "intenso"
+    ],
+    "flavor": "Higos secos + nueces + kiwicha + especias",
+    "description": "Turrón crudo sin horno, denso en nutrientes y energía duradera.",
+    "benefits": [
+      "100% crudo",
+      "Energía compacta"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "turrón crudi-vegano de higos.png"
+  },
+  {
+    "id": "tartaleta-fresas",
+    "name": "Tartaleta Cruda de Fresas",
+    "price": 12,
+    "calories": 165,
+    "badge": "Cruda",
+    "tags": [
+      "sin gluten",
+      "antiestres",
+      "intenso"
+    ],
+    "flavor": "Base de pecanas iqueñas + dátiles + crema de cashews + fresas",
+    "description": "Tartaleta fresca y frutal con base crujiente de frutos secos.",
+    "benefits": [
+      "Fibra natural",
+      "Grasas saludables"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "tartaleta cruda de fresas.png"
+  },
+  {
+    "id": "galleta-avena-lucuma",
+    "name": "Galleta de Avena y Lúcuma",
+    "price": 5,
+    "calories": 170,
+    "badge": "Tradicional",
+    "tags": [
+      "tradicional",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Hojuelas de avena + harina de lúcuma + linaza + aceite de coco",
+    "description": "Galleta peruana crujiente con el dulzor único de la lúcuma.",
+    "benefits": [
+      "Toque peruano",
+      "Fibra extra"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Galleta de avena y lúcuma.png"
+  },
+  {
+    "id": "trufas-matcha",
+    "name": "Trufas de Matcha",
+    "price": 10,
+    "calories": 140,
+    "badge": "Alto en proteína",
+    "tags": [
+      "sin gluten",
+      "concentracion",
+      "portable"
+    ],
+    "flavor": "Matcha ceremonial + almendra molida + coco rallado",
+    "description": "Textura suave y efecto calmante para sesiones largas de estudio.",
+    "benefits": [
+      "Enfoque mental",
+      "Sensorial premium"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten",
+        "vegano"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Trufas de matcha.png"
+  },
+  {
+    "id": "mousse-chia-mango",
+    "name": "Mousse de Chía y Mango",
+    "price": 8,
+    "calories": 155,
+    "badge": "Vegano",
+    "tags": [
+      "vegano",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Chía hidratada en leche de coco + puré de mango fresco",
+    "description": "Ligero, fresco y amable para horas largas en campus.",
+    "benefits": [
+      "Digestión ligera",
+      "Opción plant-based"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "Mousse de chía y mango.png"
+  },
+  {
+    "id": "torta-palta-cacao",
+    "name": "Torta de Palta y Cacao",
+    "price": 10,
+    "calories": 210,
+    "badge": "Keto",
+    "tags": [
+      "keto",
+      "energia",
+      "intenso",
+      "portable"
+    ],
+    "flavor": "Palta madura + cacao oscuro puro + endulzante natural",
+    "description": "Más cremosa, más intensa y con una personalidad marcada.",
+    "benefits": [
+      "Textura rica",
+      "Muy saciante"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "intenso"
+      ]
+    },
+    "image": "Torta de palta y cacao.png"
+  },
+  {
+    "id": "pudin-cacao-avena",
+    "name": "Pudín de Cacao y Avena",
+    "price": 6,
+    "calories": 150,
+    "badge": "Ligero",
+    "tags": [
+      "vegano",
+      "energia",
+      "fresco"
+    ],
+    "flavor": "Cacao amargo + avena remojada en leche de almendras + canela",
+    "description": "Suave y práctico para quienes buscan algo liviano con sabor intenso.",
+    "benefits": [
+      "Textura cremosa",
+      "Fácil de personalizar"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "Pudín de cacao y avena.png"
+  },
+  {
+    "id": "cheesecake-maracuya-light",
+    "name": "Cheesecake de Maracuyá Light",
+    "price": 9,
+    "calories": 175,
+    "badge": "Light",
+    "tags": [
+      "tradicional",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Queso crema ligero + maracuyá fresco + base integral",
+    "description": "Ácido, cremoso y pensado para una pausa con aire tropical.",
+    "benefits": [
+      "Perfil fresco",
+      "Muy compartible"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "Cheesecake de maracuyá light.png"
+  },
+  {
+    "id": "alfajores-avena-cacao",
+    "name": "Alfajores de Avena y Cacao",
+    "price": 6.5,
+    "calories": 170,
+    "badge": "Portátil",
+    "tags": [
+      "tradicional",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Galletas de avena integral + crema de cacao y dátiles",
+    "description": "Formato pequeño, cómodo y con sabor familiar que siempre funciona.",
+    "benefits": [
+      "Fáciles de llevar",
+      "Antojo sin culpa"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Alfajores de avena y cacao.png"
+  },
+  {
+    "id": "brownie-lucuma-nuez",
+    "name": "Brownie de Lúcuma y Nuez",
+    "price": 9.5,
+    "calories": 195,
+    "badge": "Peruano",
+    "tags": [
+      "keto",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Lúcuma peruana + nuez tostada + harina de almendras",
+    "description": "Un brownie con identidad local y energía estable para toda la jornada.",
+    "benefits": [
+      "Toque peruano",
+      "Energía sostenida"
+    ],
+    "match": {
+      "diet": [
+        "keto"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Brownie de lúcuma y nuez.png"
+  },
+  {
+    "id": "galletas-kiwicha-chocolate",
+    "name": "Galletas de Kiwicha y Chocolate 70%",
+    "price": 7.5,
+    "calories": 155,
+    "badge": "Sin gluten",
+    "tags": [
+      "sin gluten",
+      "energia",
+      "portable"
+    ],
+    "flavor": "Kiwicha inflada + chocolate oscuro + pasta de maní",
+    "description": "Croquetas crujientes de kiwicha bañadas en chocolate puro.",
+    "benefits": [
+      "Alta proteína",
+      "Crujiente único"
+    ],
+    "match": {
+      "diet": [
+        "sin gluten"
+      ],
+      "need": [
+        "energia"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Galletas de kiwicha y chocolate 70%.png"
+  },
+  {
+    "id": "queque-platano-canela",
+    "name": "Queque de Plátano y Canela",
+    "price": 6.5,
+    "calories": 200,
+    "badge": "Casero",
+    "tags": [
+      "tradicional",
+      "concentracion",
+      "portable"
+    ],
+    "flavor": "Plátano maduro + harina integral + canela + nueces pecanas",
+    "description": "Húmedo, aromático y reconfortante para una pausa productiva.",
+    "benefits": [
+      "Sabor casero",
+      "Energía natural"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "portable"
+      ]
+    },
+    "image": "Queque de plátano y canela.png"
+  },
+  {
+    "id": "crema-volteada-fit",
+    "name": "Crema Volteada Fit",
+    "price": 6,
+    "calories": 160,
+    "badge": "Fit",
+    "tags": [
+      "tradicional",
+      "antiestres",
+      "fresco"
+    ],
+    "flavor": "Huevos + leche evaporada light + vainilla + stevia",
+    "description": "El clásico peruano hecho versión saludable para darse un gusto.",
+    "benefits": [
+      "Bajo en azúcar",
+      "Tradición fit"
+    ],
+    "match": {
+      "diet": [
+        "tradicional"
+      ],
+      "need": [
+        "antiestres"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "Crema volteada fit.png"
+  },
+  {
+    "id": "helado-coco-maracuya",
+    "name": "Helado Vegano de Coco y Maracuyá",
+    "price": 8,
+    "calories": 130,
+    "badge": "Vegano",
+    "tags": [
+      "vegano",
+      "concentracion",
+      "fresco"
+    ],
+    "flavor": "Leche de coco + pulpa de maracuyá + endulzante natural",
+    "description": "Helado cremoso sin lácteos que refresca y ayuda a mantener el foco.",
+    "benefits": [
+      "Refrescante",
+      "100% vegetal"
+    ],
+    "match": {
+      "diet": [
+        "vegano"
+      ],
+      "need": [
+        "concentracion"
+      ],
+      "format": [
+        "fresco"
+      ]
+    },
+    "image": "Helado vegano de coco y maracuyá.png"
+  }
+]

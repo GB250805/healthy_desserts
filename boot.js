@@ -1,7 +1,8 @@
-(() => {
+(async () => {
   const STORAGE_KEY = 'healthy-desserts-clean-state-v1';
   const availableClassrooms = new Set();
   const classroomCatalogPromise = loadClassroomCatalog();
+  const productsPromise = loadProducts();
 
   function normalizeClassroom(classroom) {
     return classroom.trim().toUpperCase();
@@ -28,6 +29,12 @@
     return Array.from(availableClassrooms).sort();
   }
 
+  async function loadProducts() {
+    const response = await fetch('products.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error('No se pudo cargar products.json');
+    CATALOG = await response.json();
+  }
+
   function renderClassroomCatalog() {
     if (!el.classroomOptions) return;
     el.classroomOptions.innerHTML = Array.from(availableClassrooms)
@@ -36,443 +43,9 @@
       .join('');
   }
 
-  const CATALOG = [
-    {
-      id: 'barras-maca-cacao',
-      name: 'Barras de Maca, Algarrobina y Cacao',
-      price: 7.0,
-      calories: 165,
-      badge: 'Energía limpia',
-      emoji: '⚡',
-      tags: ['vegano', 'concentracion', 'portable'],
-      flavor: 'Maca andina + algarrobina + nibs de cacao',
-      description: 'Barra nutritiva con superalimentos andinos para enfoque mental sostenido.',
-      benefits: ['Energía natural', 'Enfoque sostenido'],
-      match: { diet: ['vegano'], need: ['concentracion'], format: ['portable'] },
-    },
-    {
-      id: 'brownie-canihua',
-      name: 'Brownie Proteico de Cañihua',
-      price: 9.0,
-      calories: 180,
-      badge: 'Sin gluten',
-      emoji: '🍫',
-      tags: ['sin gluten', 'concentracion', 'intenso'],
-      flavor: 'Cañihua andina + whey vegetal + cacao chuncho',
-      description: 'Brownie denso en proteínas para recuperar energía sin gluten.',
-      benefits: ['Alta proteína', 'Sin gluten'],
-      match: { diet: ['sin gluten'], need: ['concentracion'], format: ['intenso'] },
-    },
-    {
-      id: 'pie-limon-proteico',
-      name: 'Pie de Limón Proteico',
-      price: 9.0,
-      calories: 185,
-      badge: 'Fresco',
-      emoji: '🍋',
-      tags: ['keto', 'antiestres', 'fresco'],
-      flavor: 'Limón peruano + crema ligera alta en proteína',
-      description: 'Un clásico renovado para una pausa ligera y balanceada.',
-      benefits: ['Sabor cítrico', 'Postre de media tarde'],
-      match: { diet: ['keto'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'queque-zanahoria-andino',
-      name: 'Queque de Zanahoria Andino',
-      price: 7.0,
-      calories: 220,
-      badge: 'Casero',
-      emoji: '🥕',
-      tags: ['tradicional', 'energia', 'portable'],
-      flavor: 'Zanahoria, nueces, chía y harina integral',
-      description: 'Denso, aromático y cómodo para acompañar la jornada.',
-      benefits: ['Sensación casera', 'Buen snack de ruta'],
-      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'galletas-quinoa-choco',
-      name: 'Galletas de Quinoa Choco-Chips',
-      price: 7.5,
-      calories: 160,
-      badge: 'Sin gluten',
-      emoji: '🍪',
-      tags: ['sin gluten', 'energia', 'portable'],
-      flavor: 'Quinoa pop + harina de almendras + chocolate 70%',
-      description: 'Crujientes y nutritivas, pensadas para llevar sin complicaciones.',
-      benefits: ['Toque local', 'Textura crocante'],
-      match: { diet: ['sin gluten'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'cheesecake-aguaymanto',
-      name: 'Cheesecake Light de Aguaymanto',
-      price: 10.0,
-      calories: 175,
-      badge: 'Light',
-      emoji: '🟡',
-      tags: ['sin gluten', 'antiestres', 'fresco'],
-      flavor: 'Queso crema bajo en grasa + mermelada de aguaymanto',
-      description: 'Suave, cremoso y endulzado naturalmente para consentirte sin culpa.',
-      benefits: ['Antioxidante natural', 'Bajo en grasa'],
-      match: { diet: ['sin gluten'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'trufas-keto-amazonicas',
-      name: 'Trufas Keto Amazónicas',
-      price: 8.5,
-      calories: 140,
-      badge: 'Keto',
-      emoji: '🥥',
-      tags: ['keto', 'concentracion', 'intenso'],
-      flavor: 'Palta cremosa + cacao oscuro + coco rallado',
-      description: 'Bomba de grasas saludables en un bocado concentrado y delicioso.',
-      benefits: ['Alta saciedad', 'Enfoque mental'],
-      match: { diet: ['keto'], need: ['concentracion'], format: ['intenso'] },
-    },
-    {
-      id: 'pudin-chia-camu',
-      name: 'Pudín de Chía y Camu Camu',
-      price: 8.0,
-      calories: 140,
-      badge: 'Vegano',
-      emoji: '🫐',
-      tags: ['vegano', 'energia', 'fresco'],
-      flavor: 'Leche de almendras + chía + coulis de camu camu',
-      description: 'Fresco, cítrico y cargado de vitamina C para empezar con vitalidad.',
-      benefits: ['Vitamina C natural', 'Digestión ligera'],
-      match: { diet: ['vegano'], need: ['energia'], format: ['fresco'] },
-    },
-    {
-      id: 'mousse-lucuma-vegano',
-      name: 'Mousse Vegano de Lúcuma',
-      price: 10.0,
-      calories: 155,
-      badge: 'Vegano',
-      emoji: '🟢',
-      tags: ['vegano', 'antiestres', 'fresco'],
-      flavor: 'Castañas licuadas + pulpa de lúcuma + leche de coco',
-      description: 'Crema suave y dulce natural que calma el antojo sin remordimientos.',
-      benefits: ['Sabor peruano', 'Textura aterciopelada'],
-      match: { diet: ['vegano'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'alfajores-kiwicha',
-      name: 'Alfajores de Kiwicha',
-      price: 7.0,
-      calories: 170,
-      badge: 'Tradicional',
-      emoji: '🥮',
-      tags: ['tradicional', 'antiestres', 'portable'],
-      flavor: 'Harina de kiwicha + manjar blanco de dátiles',
-      description: 'Dos galletas de kiwicha abrazando un relleno cremoso y natural.',
-      benefits: ['Bocado familiar', 'Energía rápida'],
-      match: { diet: ['tradicional'], need: ['antiestres'], format: ['portable'] },
-    },
-    {
-      id: 'mazamorra-morada',
-      name: 'Copa de Mazamorra Morada Fit',
-      price: 5.5,
-      calories: 145,
-      badge: 'Fit',
-      emoji: '🟣',
-      tags: ['sin gluten', 'antiestres', 'fresco'],
-      flavor: 'Maíz morado + stevia + harina de camote',
-      description: 'Tradición peruana reinventada sin azúcar para un antojo ligero.',
-      benefits: ['Antioxidante', 'Tradición fit'],
-      match: { diet: ['sin gluten'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'volcan-chocolate',
-      name: 'Volcán de Chocolate al 80%',
-      price: 11.0,
-      calories: 175,
-      badge: 'Intenso',
-      emoji: '🌋',
-      tags: ['keto', 'antiestres', 'intenso'],
-      flavor: 'Harina de coco + eritritol + cacao puro derretido',
-      description: 'Explosión de chocolate oscuro con centro fundido para los más intensos.',
-      benefits: ['Antioxidante puro', 'Sin azúcar'],
-      match: { diet: ['keto'], need: ['antiestres'], format: ['intenso'] },
-    },
-    {
-      id: 'muffins-avena-arandanos',
-      name: 'Muffins de Avena y Arándanos',
-      price: 6.5,
-      calories: 175,
-      badge: 'Energético',
-      emoji: '🧁',
-      tags: ['tradicional', 'energia', 'portable'],
-      flavor: 'Harina de avena + plátano seda + arándanos frescos',
-      description: 'Espectaculares muffins húmedos y frutales para una dosis de energía limpia.',
-      benefits: ['Fruta natural', 'Dulzor justo'],
-      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'cuadritos-almendras',
-      name: 'Cuadritos de Almendras y Sal de Maras',
-      price: 8.5,
-      calories: 195,
-      badge: 'Keto',
-      emoji: '🟫',
-      tags: ['keto', 'concentracion', 'portable'],
-      flavor: 'Mantequilla de almendras + aceite de coco + sal de Maras',
-      description: 'Cuadrito crujiente y salado que mantiene el enfoque sin carbohidratos.',
-      benefits: ['Alta saciedad', 'Electrolitos naturales'],
-      match: { diet: ['keto'], need: ['concentracion'], format: ['portable'] },
-    },
-    {
-      id: 'turron-higos-vegano',
-      name: 'Turrón Crudi-Vegano de Higos',
-      price: 9.0,
-      calories: 180,
-      badge: 'Crudi-vegano',
-      emoji: '🍯',
-      tags: ['vegano', 'energia', 'intenso'],
-      flavor: 'Higos secos + nueces + kiwicha + especias',
-      description: 'Turrón crudo sin horno, denso en nutrientes y energía duradera.',
-      benefits: ['100% crudo', 'Energía compacta'],
-      match: { diet: ['vegano'], need: ['energia'], format: ['intenso'] },
-    },
-    {
-      id: 'tartaleta-fresas',
-      name: 'Tartaleta Cruda de Fresas',
-      price: 12.0,
-      calories: 165,
-      badge: 'Cruda',
-      emoji: '🍓',
-      tags: ['sin gluten', 'antiestres', 'intenso'],
-      flavor: 'Base de pecanas iqueñas + dátiles + crema de cashews + fresas',
-      description: 'Tartaleta fresca y frutal con base crujiente de frutos secos.',
-      benefits: ['Fibra natural', 'Grasas saludables'],
-      match: { diet: ['sin gluten'], need: ['antiestres'], format: ['intenso'] },
-    },
-    {
-      id: 'galleta-avena-lucuma',
-      name: 'Galleta de Avena y Lúcuma',
-      price: 5.0,
-      calories: 170,
-      badge: 'Tradicional',
-      emoji: '🟡',
-      tags: ['tradicional', 'energia', 'portable'],
-      flavor: 'Hojuelas de avena + harina de lúcuma + linaza + aceite de coco',
-      description: 'Galleta peruana crujiente con el dulzor único de la lúcuma.',
-      benefits: ['Toque peruano', 'Fibra extra'],
-      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'trufas-matcha',
-      name: 'Trufas de Matcha',
-      price: 10.0,
-      calories: 140,
-      badge: 'Alto en proteína',
-      emoji: '🍵',
-      tags: ['sin gluten', 'concentracion', 'portable'],
-      flavor: 'Matcha ceremonial + almendra molida + coco rallado',
-      description: 'Textura suave y efecto calmante para sesiones largas de estudio.',
-      benefits: ['Enfoque mental', 'Sensorial premium'],
-      match: { diet: ['sin gluten', 'vegano'], need: ['concentracion'], format: ['portable'] },
-    },
-    {
-      id: 'mousse-chia-mango',
-      name: 'Mousse de Chía y Mango',
-      price: 8.0,
-      calories: 155,
-      badge: 'Vegano',
-      emoji: '🥭',
-      tags: ['vegano', 'antiestres', 'fresco'],
-      flavor: 'Chía hidratada en leche de coco + puré de mango fresco',
-      description: 'Ligero, fresco y amable para horas largas en campus.',
-      benefits: ['Digestión ligera', 'Opción plant-based'],
-      match: { diet: ['vegano'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'torta-palta-cacao',
-      name: 'Torta de Palta y Cacao',
-      price: 10.0,
-      calories: 210,
-      badge: 'Keto',
-      emoji: '🥑',
-      tags: ['keto', 'energia', 'intenso', 'portable'],
-      flavor: 'Palta madura + cacao oscuro puro + endulzante natural',
-      description: 'Más cremosa, más intensa y con una personalidad marcada.',
-      benefits: ['Textura rica', 'Muy saciante'],
-      match: { diet: ['keto'], need: ['energia'], format: ['intenso'] },
-    },
-    {
-      id: 'pudin-cacao-avena',
-      name: 'Pudín de Cacao y Avena',
-      price: 6.0,
-      calories: 150,
-      badge: 'Ligero',
-      emoji: '🍮',
-      tags: ['vegano', 'energia', 'fresco'],
-      flavor: 'Cacao amargo + avena remojada en leche de almendras + canela',
-      description: 'Suave y práctico para quienes buscan algo liviano con sabor intenso.',
-      benefits: ['Textura cremosa', 'Fácil de personalizar'],
-      match: { diet: ['vegano'], need: ['energia'], format: ['fresco'] },
-    },
-    {
-      id: 'cheesecake-maracuya-light',
-      name: 'Cheesecake de Maracuyá Light',
-      price: 9.0,
-      calories: 175,
-      badge: 'Light',
-      emoji: '🧡',
-      tags: ['tradicional', 'antiestres', 'fresco'],
-      flavor: 'Queso crema ligero + maracuyá fresco + base integral',
-      description: 'Ácido, cremoso y pensado para una pausa con aire tropical.',
-      benefits: ['Perfil fresco', 'Muy compartible'],
-      match: { diet: ['tradicional'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'alfajores-avena-cacao',
-      name: 'Alfajores de Avena y Cacao',
-      price: 6.5,
-      calories: 170,
-      badge: 'Portátil',
-      emoji: '🥮',
-      tags: ['tradicional', 'energia', 'portable'],
-      flavor: 'Galletas de avena integral + crema de cacao y dátiles',
-      description: 'Formato pequeño, cómodo y con sabor familiar que siempre funciona.',
-      benefits: ['Fáciles de llevar', 'Antojo sin culpa'],
-      match: { diet: ['tradicional'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'brownie-lucuma-nuez',
-      name: 'Brownie de Lúcuma y Nuez',
-      price: 9.5,
-      calories: 195,
-      badge: 'Peruano',
-      emoji: '🌰',
-      tags: ['keto', 'energia', 'portable'],
-      flavor: 'Lúcuma peruana + nuez tostada + harina de almendras',
-      description: 'Un brownie con identidad local y energía estable para toda la jornada.',
-      benefits: ['Toque peruano', 'Energía sostenida'],
-      match: { diet: ['keto'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'galletas-kiwicha-chocolate',
-      name: 'Galletas de Kiwicha y Chocolate 70%',
-      price: 7.5,
-      calories: 155,
-      badge: 'Sin gluten',
-      emoji: '🍪',
-      tags: ['sin gluten', 'energia', 'portable'],
-      flavor: 'Kiwicha inflada + chocolate oscuro + pasta de maní',
-      description: 'Croquetas crujientes de kiwicha bañadas en chocolate puro.',
-      benefits: ['Alta proteína', 'Crujiente único'],
-      match: { diet: ['sin gluten'], need: ['energia'], format: ['portable'] },
-    },
-    {
-      id: 'queque-platano-canela',
-      name: 'Queque de Plátano y Canela',
-      price: 6.5,
-      calories: 200,
-      badge: 'Casero',
-      emoji: '🍌',
-      tags: ['tradicional', 'concentracion', 'portable'],
-      flavor: 'Plátano maduro + harina integral + canela + nueces pecanas',
-      description: 'Húmedo, aromático y reconfortante para una pausa productiva.',
-      benefits: ['Sabor casero', 'Energía natural'],
-      match: { diet: ['tradicional'], need: ['concentracion'], format: ['portable'] },
-    },
-    {
-      id: 'crema-volteada-fit',
-      name: 'Crema Volteada Fit',
-      price: 6.0,
-      calories: 160,
-      badge: 'Fit',
-      emoji: '🍮',
-      tags: ['tradicional', 'antiestres', 'fresco'],
-      flavor: 'Huevos + leche evaporada light + vainilla + stevia',
-      description: 'El clásico peruano hecho versión saludable para darse un gusto.',
-      benefits: ['Bajo en azúcar', 'Tradición fit'],
-      match: { diet: ['tradicional'], need: ['antiestres'], format: ['fresco'] },
-    },
-    {
-      id: 'helado-coco-maracuya',
-      name: 'Helado Vegano de Coco y Maracuyá',
-      price: 8.0,
-      calories: 130,
-      badge: 'Vegano',
-      emoji: '🍨',
-      tags: ['vegano', 'concentracion', 'fresco'],
-      flavor: 'Leche de coco + pulpa de maracuyá + endulzante natural',
-      description: 'Helado cremoso sin lácteos que refresca y ayuda a mantener el foco.',
-      benefits: ['Refrescante', '100% vegetal'],
-      match: { diet: ['vegano'], need: ['concentracion'], format: ['fresco'] },
-    },
-  ];
-
-  const IMAGE_FILES = {
-    'barras-maca-cacao': 'barras de maca.png',
-    'brownie-canihua': 'brownie proteico de cañihua.png',
-    'pie-limon-proteico': 'pie de limon proteico.png',
-    'queque-zanahoria-andino': 'queque de zanahoria andino.png',
-    'galletas-quinoa-choco': 'galletas de quinoa choco-chips.png',
-    'cheesecake-aguaymanto': 'cheesecake light de aguaymanto.png',
-    'trufas-keto-amazonicas': 'trufas keto amazónicas.png',
-    'pudin-chia-camu': 'pudín de chía y camu camu.png',
-    'mousse-lucuma-vegano': 'mousse vegano de lúcuma.png',
-    'alfajores-kiwicha': 'alfajores de kiwicha.png',
-    'mazamorra-morada': 'copa de mazamorra morada fit.png',
-    'volcan-chocolate': 'volcán de chocolate al 80%.png',
-    'muffins-avena-arandanos': 'muffins de avena y arándanos.png',
-    'cuadritos-almendras': 'cuadritos de almendras y sal de Maras.png',
-    'turron-higos-vegano': 'turrón crudi-vegano de higos.png',
-    'tartaleta-fresas': 'tartaleta cruda de fresas.png',
-    'galleta-avena-lucuma': 'Galleta de avena y lúcuma.png',
-    'trufas-matcha': 'Trufas de matcha.png',
-    'mousse-chia-mango': 'Mousse de chía y mango.png',
-    'torta-palta-cacao': 'Torta de palta y cacao.png',
-    'pudin-cacao-avena': 'Pudín de cacao y avena.png',
-    'cheesecake-maracuya-light': 'Cheesecake de maracuyá light.png',
-    'alfajores-avena-cacao': 'Alfajores de avena y cacao.png',
-    'brownie-lucuma-nuez': 'Brownie de lúcuma y nuez.png',
-    'galletas-kiwicha-chocolate': 'Galletas de kiwicha y chocolate 70%.png',
-    'queque-platano-canela': 'Queque de plátano y canela.png',
-    'crema-volteada-fit': 'Crema volteada fit.png',
-    'helado-coco-maracuya': 'Helado vegano de coco y maracuyá.png',
-  };
-
   function imageFor(id) {
-    return 'pics/' + encodeURI(IMAGE_FILES[id] || '');
-  }
-
-  const DEFAULT_GRADIENT = 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
-
-  const MATCH_GRADIENTS = {
-    'barras-maca-cacao': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-    'brownie-canihua': 'linear-gradient(135deg, #f5be65, #7b4a2e)',
-    'pie-limon-proteico': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-    'queque-zanahoria-andino': 'linear-gradient(135deg, #ffcb93, #d96d37)',
-    'galletas-quinoa-choco': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-    'cheesecake-aguaymanto': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-    'trufas-keto-amazonicas': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-    'pudin-chia-camu': 'linear-gradient(135deg, #bcead3, #76c68d)',
-    'mousse-lucuma-vegano': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-    'alfajores-kiwicha': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-    'mazamorra-morada': 'linear-gradient(135deg, #d4b8e0, #7b4fa0)',
-    'volcan-chocolate': 'linear-gradient(135deg, #d8d0c8, #6b3a2a)',
-    'muffins-avena-arandanos': 'linear-gradient(135deg, #ffc8a2, #b06d8a)',
-    'cuadritos-almendras': 'linear-gradient(135deg, #f7d680, #b8863a)',
-    'turron-higos-vegano': 'linear-gradient(135deg, #d4a574, #7b4a2e)',
-    'tartaleta-fresas': 'linear-gradient(135deg, #ffb5b5, #e86a6a)',
-    'galleta-avena-lucuma': 'linear-gradient(135deg, #f2e78b, #d09c2d)',
-    'trufas-matcha': 'linear-gradient(135deg, #c9f0d0, #39b676)',
-    'mousse-chia-mango': 'linear-gradient(135deg, #bcead3, #76c68d)',
-    'torta-palta-cacao': 'linear-gradient(135deg, #a7d8b8, #4f8d5a)',
-    'pudin-cacao-avena': 'linear-gradient(135deg, #d8d0c8, #916f57)',
-    'cheesecake-maracuya-light': 'linear-gradient(135deg, #ffefb1, #ff9f7a)',
-    'alfajores-avena-cacao': 'linear-gradient(135deg, #f0dfb7, #b57b4b)',
-    'brownie-lucuma-nuez': 'linear-gradient(135deg, #f7d680, #bb7a35)',
-    'galletas-kiwicha-chocolate': 'linear-gradient(135deg, #d6b4ff, #7c54f0)',
-    'queque-platano-canela': 'linear-gradient(135deg, #ffc8a2, #d96d37)',
-    'crema-volteada-fit': 'linear-gradient(135deg, #fff0a4, #f08f61)',
-    'helado-coco-maracuya': 'linear-gradient(135deg, #bcead3, #76c68d)',
-  };
-
-  function gradientFor(id) {
-    return MATCH_GRADIENTS[id] || DEFAULT_GRADIENT;
+    const product = CATALOG.find(function(p) { return p.id === id; });
+    return product && product.image ? 'pics/' + encodeURI(product.image) : '';
   }
 
   const QUESTIONS = [
@@ -570,6 +143,8 @@
   };
 
   const state = loadState();
+  state.student = { answers: { diet: '', need: '', format: '' }, selectedFilter: 'todos', cart: [] };
+  saveState();
   let selectedFilter = state.student.selectedFilter || 'todos';
   let selectedView = 'home';
   let pendingOrder = null;
@@ -873,7 +448,7 @@
     if (!state.student.cart.length) { toast('Tu carrito está vacío. Agrega al menos un producto.'); return; }
     const items = state.student.cart.map((entry) => {
       const item = CATALOG.find((product) => product.id === entry.id);
-      return { id: item.id, name: item.name, price: item.price, emoji: item.emoji, quantity: entry.quantity };
+      return { id: item.id, name: item.name, price: item.price, image: item.image, quantity: entry.quantity };
     });
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     pendingOrder = { classroom, items, total: Number(total.toFixed(2)) };
@@ -1049,7 +624,7 @@
   el.resetDemoDataButton.addEventListener('click', resetDemo);
   el.bottomNavItems.forEach((item) => item.addEventListener('click', () => showView(item.dataset.view)));
 
-  classroomCatalogPromise
+  Promise.all([classroomCatalogPromise, productsPromise])
     .then(() => {
       renderClassroomCatalog();
       el.classroomInput.setAttribute('list', 'classroomOptions');
