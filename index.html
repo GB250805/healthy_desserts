@@ -147,7 +147,7 @@
           <span>Ingresos</span>
           <strong id="adminRevenue">S/ 0.00</strong>
         </article>
-        <article class="stat-card">
+        <article class="stat-card stat-card--clickable" id="adminReadyCard">
           <span>Entregas listas</span>
           <strong id="adminReady">0</strong>
         </article>
@@ -252,6 +252,19 @@
         <p class="warning-note">Verifique bien sus datos porque servirán como identificador para la entrega/recojo del pedido.</p>
         <button class="button button--primary" type="submit">Enviar</button>
       </form>
+    </div>
+  </div>
+
+  <div class="modal is-hidden" id="deliveryHistoryModal" role="dialog" aria-modal="true" aria-labelledby="deliveryHistoryTitle">
+    <div class="modal__panel">
+      <div class="section-header">
+        <div>
+          <p class="eyebrow">Historial</p>
+          <h2 id="deliveryHistoryTitle">Entregas realizadas</h2>
+        </div>
+        <button class="text-button" id="closeHistoryButton" type="button">Cerrar</button>
+      </div>
+      <div class="admin-orders" id="deliveryHistoryList"></div>
     </div>
   </div>
 

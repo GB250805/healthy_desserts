@@ -927,6 +927,16 @@ input:focus {
   border-color: rgba(16, 185, 129, 0.12);
 }
 
+.stat-card--clickable {
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.stat-card--clickable:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--glass-border-hover);
+}
+
 .order-card,
 .catalog-card,
 .student-item {
@@ -974,6 +984,25 @@ input:focus {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
+}
+
+.deliver-button {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--primary);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.deliver-button:hover {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.35);
 }
 
 .order-status {

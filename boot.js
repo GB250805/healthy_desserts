@@ -128,7 +128,11 @@
     adminTodayOrders: document.getElementById('adminTodayOrders'),
     adminRevenue: document.getElementById('adminRevenue'),
     adminReady: document.getElementById('adminReady'),
+    adminReadyCard: document.getElementById('adminReadyCard'),
     adminOrders: document.getElementById('adminOrders'),
+    deliveryHistoryModal: document.getElementById('deliveryHistoryModal'),
+    deliveryHistoryList: document.getElementById('deliveryHistoryList'),
+    closeHistoryButton: document.getElementById('closeHistoryButton'),
     adminCatalog: document.getElementById('adminCatalog'),
     studentList: document.getElementById('studentList'),
     classroomOptions: document.getElementById('classroomOptions'),
@@ -411,7 +415,7 @@
     const revenue = orders.reduce((sum, order) => sum + order.total, 0);
     el.adminTodayOrders.textContent = String(orders.length);
     el.adminRevenue.textContent = money(revenue);
-    el.adminReady.textContent = String(orders.filter((order) => order.status === 'ready').length);
+    el.adminReady.textContent = String(orders.filter((order) => order.status === 'done').length);
     el.adminOrders.innerHTML = orders.length ? orders.slice(0, 7).map((order) => `
       <article class="order-card">
         <div class="order-card__body">
@@ -420,15 +424,52 @@
             <span class="order-status order-status--${order.status}">${({ new: 'Nuevo', cooking: 'En preparación', ready: 'Listo', done: 'Entregado' })[order.status] || 'Nuevo'}</span>
           </div>
           <p class="admin-order__meta">${order.buyer ? `📞 ${order.buyer.celular}` : ''}${order.items.map((item) => ` · ${item.quantity}x ${item.name}`).join('')}</p>
-          <div class="order-card__footer"><strong>${money(order.total)}</strong></div>
+          <div class="order-card__footer"><strong>${money(order.total)}</strong>${order.status !== 'done' ? `<button type="button" class="deliver-button" data-deliver="${order.id}">Marcar entregado</button>` : ''}</div>
         </div>
       </article>
     `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay pedidos todavía.</strong><p class="muted">Cuando un estudiante confirme un pedido aparecerá aquí.</p></div></article>';
+    el.adminOrders.querySelectorAll('[data-deliver]').forEach((button) => {
+        button.addEventListener('click', () => markAsDelivered(button.dataset.deliver));
+    });
     el.adminCatalog.innerHTML = CATALOG.slice(0, 8).map((item) => `<article class="catalog-card"><div class="catalog-card__visual"><img src="${imageFor(item.id)}" alt="${item.name}" loading="lazy" /></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>`).join('');
     el.studentList.innerHTML = `
       <article class="student-item"><div class="student-item__body"><strong>Tienda abierta</strong><p class="student-item__meta">Cualquier persona puede pedir sin necesidad de cuenta.</p></div></article>
       <article class="student-item"><div class="student-item__body"><strong>Pedidos con entrega de aula</strong><p class="student-item__meta">Solo se aceptan aulas incluidas en aulas.csv.</p></div></article>
     `;
+  }
+
+  function markAsDelivered(orderId) {
+    const order = state.orders.find((o) => o.id === orderId);
+    if (!order || order.status === 'done') return;
+    order.status = 'done';
+    saveState();
+    renderAdmin();
+    toast(`Pedido ${orderId} marcado como entregado.`);
+  }
+
+  function renderDeliveryHistory() {
+    const doneOrders = state.orders.filter((order) => order.status === 'done');
+    el.deliveryHistoryList.innerHTML = doneOrders.length ? doneOrders.map((order) => `
+      <article class="order-card">
+        <div class="order-card__body">
+          <div class="order-card__header">
+            <div><strong>${order.id}</strong><p class="admin-order__meta">${order.classroom}${order.buyer ? ` · ${order.buyer.nombres} ${order.buyer.apellidos} · ID: ${order.buyer.id}` : ''}</p></div>
+            <span class="order-status order-status--done">Entregado</span>
+          </div>
+          <p class="admin-order__meta">${order.buyer ? `📞 ${order.buyer.celular}` : ''}${order.items.map((item) => ` · ${item.quantity}x ${item.name}`).join('')}</p>
+          <div class="order-card__footer"><strong>${money(order.total)}</strong></div>
+        </div>
+      </article>
+    `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay entregas todavía.</strong><p class="muted">Los pedidos marcados como entregados aparecerán aquí.</p></div></article>';
+  }
+
+  function openDeliveryHistory() {
+    renderDeliveryHistory();
+    el.deliveryHistoryModal.classList.remove('is-hidden');
+  }
+
+  function closeDeliveryHistory() {
+    el.deliveryHistoryModal.classList.add('is-hidden');
   }
 
   function showView(view) {
@@ -595,6 +636,9 @@
   el.goToAdminButton.addEventListener('click', openAdminPasswordModal);
   el.adminPasswordForm.addEventListener('submit', handleAdminPasswordSubmit);
   el.adminPasswordModal.addEventListener('click', (event) => { if (event.target === el.adminPasswordModal) closeAdminPasswordModal(); });
+  el.adminReadyCard.addEventListener('click', openDeliveryHistory);
+  el.closeHistoryButton.addEventListener('click', closeDeliveryHistory);
+  el.deliveryHistoryModal.addEventListener('click', (event) => { if (event.target === el.deliveryHistoryModal) closeDeliveryHistory(); });
   el.backToStoreButton.addEventListener('click', () => { setScreen('student'); });
   el.restartQuizButton.addEventListener('click', () => { state.student.answers = { diet: '', need: '', format: '' }; saveState(); renderQuestionnaire(); renderMatch(); renderHero(); toast('Flujo reiniciado.'); });
   el.wizardNextButton.addEventListener('click', () => {
