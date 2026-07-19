@@ -108,10 +108,13 @@ img {
   border-color: var(--glass-border-hover);
 }
 
+.glass + .glass,
+.card + .glass,
+.glass + .card,
 .card + .card,
 .card + .stats-grid,
 .stats-grid + .card {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 /* ===================================================================
@@ -461,6 +464,14 @@ p {
   flex: 0 0 auto;
   transition: background 0.4s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.match-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .match-tags {
@@ -570,13 +581,14 @@ p {
   min-height: 100px;
   position: relative;
   overflow: hidden;
+  background: rgba(16, 185, 129, 0.04);
 }
 
-.product-card__visual::before {
-  content: attr(data-emoji);
-  position: absolute;
-  inset: auto 10px 10px auto;
-  font-size: 1.6rem;
+.product-card__visual img {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  display: block;
 }
 
 .product-card__body {
@@ -665,11 +677,16 @@ p {
   width: 60px;
   height: 60px;
   border-radius: 14px;
-  display: grid;
-  place-items: center;
-  font-size: 1.4rem;
-  background: rgba(16, 185, 129, 0.06);
+  overflow: hidden;
   flex: 0 0 auto;
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.cart-item__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .remove-button {
@@ -823,6 +840,7 @@ input:focus {
   cursor: pointer;
   transition: all var(--transition);
   padding: 6px;
+  position: relative;
 }
 
 .bottom-nav__item:hover {
@@ -846,20 +864,19 @@ input:focus {
 }
 
 .badge {
-  min-width: 20px;
-  height: 20px;
+  min-width: 18px;
+  height: 18px;
   border-radius: 999px;
   padding: 0 5px;
   display: inline-grid;
   place-items: center;
   background: var(--primary-gradient);
   color: #fff;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   font-weight: 700;
   position: absolute;
-  top: 2px;
-  right: 50%;
-  transform: translateX(18px);
+  top: 0;
+  right: calc(50% - 22px);
 }
 
 /* ===================================================================
@@ -981,13 +998,14 @@ input:focus {
   min-height: 80px;
   position: relative;
   overflow: hidden;
+  background: rgba(16, 185, 129, 0.02);
 }
 
-.catalog-card__visual::before {
-  content: attr(data-emoji);
-  position: absolute;
-  inset: auto 10px 8px auto;
-  font-size: 1.4rem;
+.catalog-card__visual img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  display: block;
 }
 
 .catalog-card__header {
@@ -1142,6 +1160,10 @@ input:focus {
 
   .product-card__visual {
     min-height: 120px;
+  }
+
+  .product-card__visual img {
+    height: 120px;
   }
 
   .stats-grid {

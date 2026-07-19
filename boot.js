@@ -403,6 +403,41 @@
     },
   ];
 
+  const IMAGE_FILES = {
+    'barras-maca-cacao': 'barras de maca.png',
+    'brownie-canihua': 'brownie proteico de cañihua.png',
+    'pie-limon-proteico': 'pie de limon proteico.png',
+    'queque-zanahoria-andino': 'queque de zanahoria andino.png',
+    'galletas-quinoa-choco': 'galletas de quinoa choco-chips.png',
+    'cheesecake-aguaymanto': 'cheesecake light de aguaymanto.png',
+    'trufas-keto-amazonicas': 'trufas keto amazónicas.png',
+    'pudin-chia-camu': 'pudín de chía y camu camu.png',
+    'mousse-lucuma-vegano': 'mousse vegano de lúcuma.png',
+    'alfajores-kiwicha': 'alfajores de kiwicha.png',
+    'mazamorra-morada': 'copa de mazamorra morada fit.png',
+    'volcan-chocolate': 'volcán de chocolate al 80%.png',
+    'muffins-avena-arandanos': 'muffins de avena y arándanos.png',
+    'cuadritos-almendras': 'cuadritos de almendras y sal de Maras.png',
+    'turron-higos-vegano': 'turrón crudi-vegano de higos.png',
+    'tartaleta-fresas': 'tartaleta cruda de fresas.png',
+    'galleta-avena-lucuma': 'Galleta de avena y lúcuma.png',
+    'trufas-matcha': 'Trufas de matcha.png',
+    'mousse-chia-mango': 'Mousse de chía y mango.png',
+    'torta-palta-cacao': 'Torta de palta y cacao.png',
+    'pudin-cacao-avena': 'Pudín de cacao y avena.png',
+    'cheesecake-maracuya-light': 'Cheesecake de maracuyá light.png',
+    'alfajores-avena-cacao': 'Alfajores de avena y cacao.png',
+    'brownie-lucuma-nuez': 'Brownie de lúcuma y nuez.png',
+    'galletas-kiwicha-chocolate': 'Galletas de kiwicha y chocolate 70%.png',
+    'queque-platano-canela': 'Queque de plátano y canela.png',
+    'crema-volteada-fit': 'Crema volteada fit.png',
+    'helado-coco-maracuya': 'Helado vegano de coco y maracuyá.png',
+  };
+
+  function imageFor(id) {
+    return 'pics/' + encodeURI(IMAGE_FILES[id] || '');
+  }
+
   const DEFAULT_GRADIENT = 'linear-gradient(135deg, #c9f0d0, #7ecb59)';
 
   const MATCH_GRADIENTS = {
@@ -698,6 +733,7 @@
       el.matchTags.innerHTML = '<span>Encuesta pendiente</span>';
       el.matchPrice.textContent = '—';
       el.matchCalories.textContent = '';
+      el.matchVisual.innerHTML = '';
       el.matchVisual.style.background = 'transparent';
       return;
     }
@@ -706,7 +742,8 @@
     el.matchPrice.textContent = money(match.price);
     el.matchCalories.textContent = `${match.calories} kcal`;
     el.matchTags.innerHTML = match.benefits.map((benefit) => `<span>${benefit}</span>`).join('');
-    el.matchVisual.style.background = gradientFor(match.id);
+    el.matchVisual.style.background = 'transparent';
+    el.matchVisual.innerHTML = `<img src="${imageFor(match.id)}" alt="${match.name}" />`;
   }
 
   function renderMenu() {
@@ -731,17 +768,17 @@
     const visible = selectedFilter === 'todos'
       ? CATALOG
       : CATALOG.filter((item) => item.tags.some((tag) => normalizeValue(tag) === normalizeValue(selectedFilter)));
-    el.menuGrid.innerHTML = visible.map((item) => `
-      <article class="product-card">
-        <div class="product-card__visual" data-emoji="${item.emoji}" style="background:${gradientFor(item.id)}"></div>
-        <div class="product-card__body">
-          <span class="product-chip">${item.badge}</span>
-          <strong>${item.name}</strong>
-          <p class="product-meta">${item.flavor}</p>
-          <div class="product-price"><span>${money(item.price)}</span><button type="button" class="text-button" data-add="${item.id}">Añadir</button></div>
-        </div>
-      </article>
-    `).join('');
+    el.menuGrid.innerHTML = visible.map((item) => `<article class="product-card">
+  <div class="product-card__visual">
+    <img src="${imageFor(item.id)}" alt="${item.name}" loading="lazy" />
+  </div>
+  <div class="product-card__body">
+    <span class="product-chip">${item.badge}</span>
+    <strong>${item.name}</strong>
+    <p class="product-meta">${item.flavor}</p>
+    <div class="product-price"><span>${money(item.price)}</span><button type="button" class="text-button" data-add="${item.id}">Añadir</button></div>
+  </div>
+</article>`).join('');
     el.menuGrid.querySelectorAll('[data-add]').forEach((button) => {
       button.addEventListener('click', () => {
         const existing = state.student.cart.find((entry) => entry.id === button.dataset.add);
@@ -764,7 +801,7 @@
       <article class="cart-item">
         <div class="cart-item__body">
           <div class="cart-item__header">
-            <div class="cart-item__media" aria-hidden="true">${item.emoji}</div>
+            <div class="cart-item__media" aria-hidden="true"><img src="${imageFor(item.id)}" alt="${item.name}" /></div>
             <div><strong>${item.name}</strong><p class="muted">${item.flavor}</p></div>
             <button class="remove-button" type="button" data-remove="${item.id}">Eliminar</button>
           </div>
@@ -812,9 +849,7 @@
         </div>
       </article>
     `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay pedidos todavía.</strong><p class="muted">Cuando un estudiante confirme un pedido aparecerá aquí.</p></div></article>';
-    el.adminCatalog.innerHTML = CATALOG.slice(0, 8).map((item) => `
-      <article class="catalog-card"><div class="catalog-card__visual" data-emoji="${item.emoji}" style="background:${gradientFor(item.id)}"></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>
-    `).join('');
+    el.adminCatalog.innerHTML = CATALOG.slice(0, 8).map((item) => `<article class="catalog-card"><div class="catalog-card__visual"><img src="${imageFor(item.id)}" alt="${item.name}" loading="lazy" /></div><div class="catalog-card__body"><div class="catalog-card__header"><div><strong>${item.name}</strong><p class="admin-catalog__meta">${item.flavor}</p></div><span class="admin-chip">${item.badge}</span></div><div class="price-row"><span>${item.calories} kcal</span><strong>${money(item.price)}</strong></div></div></article>`).join('');
     el.studentList.innerHTML = `
       <article class="student-item"><div class="student-item__body"><strong>Tienda abierta</strong><p class="student-item__meta">Cualquier persona puede pedir sin necesidad de cuenta.</p></div></article>
       <article class="student-item"><div class="student-item__body"><strong>Pedidos con entrega de aula</strong><p class="student-item__meta">Solo se aceptan aulas incluidas en aulas.csv.</p></div></article>
