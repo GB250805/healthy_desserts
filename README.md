@@ -39,7 +39,7 @@ Prototipo web mobile-first para estudiantes, construido con HTML, CSS y JavaScri
 - Nombres y apellidos: solo letras (incluyendo caracteres acentuados del español).
 - ID estudiantil: exactamente 9 dígitos.
 - Celular: solo números, opcionalmente con `+` al inicio (ej. `+51987654321`).
-- Admin: contraseña `123456789`, bloqueo temporal tras 5 intentos fallidos (60s).
+- Admin: bloqueo temporal tras 5 intentos fallidos (60s).
 - Pago presencial al recoger el pedido; no existe pasarela de pago.
 
 ## WhatsApp

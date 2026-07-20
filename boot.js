@@ -193,7 +193,7 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
-  const ADMIN_PASSWORD = '123456789';
+  const ADMIN_PASSWORD = 'Gabobh2005#';
   const ADMIN_LOCK_KEY = 'healthy-desserts-admin-lock-v1';
   const MAX_LOGIN_ATTEMPTS = 5;
   const LOCKOUT_DURATION_MS = 60 * 1000;
