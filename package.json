@@ -1,0 +1,13 @@
+{
+  "name": "healthy-desserts",
+  "version": "2.0.0",
+  "description": "Healthy Desserts - Sistema de pedidos con base de datos",
+  "scripts": {
+    "vercel-dev": "vercel dev"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "dotenv": "^16.4.7",
+    "uuid": "^11.1.0"
+  }
+}

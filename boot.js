@@ -1,5 +1,29 @@
 (async () => {
   const STORAGE_KEY = 'healthy-desserts-clean-state-v1';
+  const API_BASE = '';
+
+  const API = {
+    token: sessionStorage.getItem('admin-token') || null,
+    async request(method, path, body) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (this.token) headers['Authorization'] = `Bearer ${this.token}`;
+      const res = await fetch(API_BASE + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+      const data = await res.json();
+      if (!res.ok) {
+        const err = new Error(data.error || 'Error de conexión');
+        err.status = res.status;
+        err.data = data;
+        throw err;
+      }
+      return data;
+    },
+    login(password) { return this.request('POST', '/api/admin/login', { password }); },
+    logout() { return this.request('POST', '/api/admin/logout'); },
+    getOrders() { return this.request('GET', '/api/orders'); },
+    createOrder(order) { return this.request('POST', '/api/orders', order); },
+    updateOrder(id, data) { return this.request('PATCH', `/api/orders/${id}`, data); },
+    deleteAllOrders() { return this.request('DELETE', '/api/orders'); },
+  };
   const availableClassrooms = new Set();
   const classroomCatalogPromise = loadClassroomCatalog();
   const productsPromise = loadProducts();
@@ -146,6 +170,7 @@
     bottomNavItems: Array.from(document.querySelectorAll('.bottom-nav__item')),
   };
 
+  let adminOrders = [];
   const state = loadState();
   state.student = { answers: { diet: '', need: '', format: '' }, selectedFilter: 'todos', cart: [] };
   saveState();
@@ -153,7 +178,7 @@
   let selectedView = 'home';
   let pendingOrder = null;
   let lastConfirmedBuyer = null;
-  let adminLock = loadAdminLock();
+  let adminLock = { attempts: 0, lockUntil: 0 };
   let adminLockCountdown = null;
 
   function defaultState() {
@@ -163,7 +188,6 @@
         selectedFilter: 'todos',
         cart: [],
       },
-      orders: [],
     };
   }
 
@@ -182,7 +206,6 @@
           answers: { ...base.student.answers, ...((parsed.student && parsed.student.answers) || {}) },
           cart: Array.isArray(parsed.student && parsed.student.cart) ? parsed.student.cart : base.student.cart,
         },
-        orders: Array.isArray(parsed.orders) ? parsed.orders : [],
       };
     } catch {
       return defaultState();
@@ -191,25 +214,6 @@
 
   function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }
-
-  const ADMIN_PASSWORD = 'Gabobh2005#';
-  const ADMIN_LOCK_KEY = 'healthy-desserts-admin-lock-v1';
-  const MAX_LOGIN_ATTEMPTS = 5;
-  const LOCKOUT_DURATION_MS = 60 * 1000;
-
-  function loadAdminLock() {
-    try {
-      const raw = localStorage.getItem(ADMIN_LOCK_KEY);
-      const parsed = raw ? JSON.parse(raw) : null;
-      return { attempts: Number(parsed?.attempts) || 0, lockUntil: Number(parsed?.lockUntil) || 0 };
-    } catch {
-      return { attempts: 0, lockUntil: 0 };
-    }
-  }
-
-  function saveAdminLock() {
-    localStorage.setItem(ADMIN_LOCK_KEY, JSON.stringify(adminLock));
   }
 
   function isAdminLocked() {
@@ -410,8 +414,17 @@
     el.studentGreeting.textContent = 'Hola, estudiante';
   }
 
+  async function loadAdminData() {
+    try {
+      const response = await API.getOrders();
+      adminOrders = response.orders;
+    } catch (err) {
+      adminOrders = [];
+    }
+  }
+
   function renderAdmin() {
-    const orders = state.orders;
+    const orders = adminOrders;
     const revenue = orders.reduce((sum, order) => sum + order.total, 0);
     el.adminTodayOrders.textContent = String(orders.length);
     el.adminRevenue.textContent = money(revenue);
@@ -438,17 +451,19 @@
     `;
   }
 
-  function markAsDelivered(orderId) {
-    const order = state.orders.find((o) => o.id === orderId);
-    if (!order || order.status === 'done') return;
-    order.status = 'done';
-    saveState();
-    renderAdmin();
-    toast(`Pedido ${orderId} marcado como entregado.`);
+  async function markAsDelivered(orderId) {
+    try {
+      await API.updateOrder(orderId, { status: 'done' });
+      await loadAdminData();
+      renderAdmin();
+      toast(`Pedido ${orderId} marcado como entregado.`);
+    } catch (err) {
+      toast('Error al marcar como entregado');
+    }
   }
 
   function renderDeliveryHistory() {
-    const doneOrders = state.orders.filter((order) => order.status === 'done');
+    const doneOrders = adminOrders.filter((order) => order.status === 'done');
     el.deliveryHistoryList.innerHTML = doneOrders.length ? doneOrders.map((order) => `
       <article class="order-card">
         <div class="order-card__body">
@@ -463,7 +478,8 @@
     `).join('') : '<article class="order-card"><div class="order-card__body"><strong>No hay entregas todavía.</strong><p class="muted">Los pedidos marcados como entregados aparecerán aquí.</p></div></article>';
   }
 
-  function openDeliveryHistory() {
+  async function openDeliveryHistory() {
+    await loadAdminData();
     renderDeliveryHistory();
     el.deliveryHistoryModal.classList.remove('is-hidden');
   }
@@ -500,7 +516,7 @@
     el.regNombres.focus();
   }
 
-  function submitRegistration(event) {
+  async function submitRegistration(event) {
     event.preventDefault();
     const nombres = el.regNombres.value.trim();
     const apellidos = el.regApellidos.value.trim();
@@ -519,28 +535,22 @@
 
     const { classroom, items, total } = pendingOrder;
     const buyer = { nombres, apellidos, id, celular };
-    lastConfirmedBuyer = buyer;
-    state.orders.unshift({
-      id: `HD-${Date.now().toString(36).toUpperCase()}`,
-      userId: null,
-      buyer,
-      classroom,
-      status: 'new',
-      createdAt: new Date().toISOString(),
-      items,
-      total,
-    });
-    state.student.cart = [];
-    saveState();
-    renderCart();
-    renderAdmin();
-    renderHero();
-    el.orderForm.reset();
-    pendingOrder = null;
-    el.registrationModal.classList.add('is-hidden');
-    openOrderConfirmation({ classroom, total, orderId: state.orders[0].id, nombres, id });
-    toast(`Pedido confirmado para ${classroom}.`);
-    showView('home');
+    try {
+      const response = await API.createOrder({ buyer, classroom, items, total });
+      lastConfirmedBuyer = buyer;
+      state.student.cart = [];
+      saveState();
+      renderCart();
+      renderHero();
+      el.orderForm.reset();
+      pendingOrder = null;
+      el.registrationModal.classList.add('is-hidden');
+      openOrderConfirmation({ classroom, total, orderId: response.order.id, nombres, id });
+      toast(`Pedido confirmado para ${classroom}.`);
+      showView('home');
+    } catch (err) {
+      toast(err.message || 'Error al crear el pedido');
+    }
   }
 
   function openOrderConfirmation(order) {
@@ -562,8 +572,12 @@
     el.orderConfirmationModal.classList.add('is-hidden');
   }
 
-  function resetDemo() {
+  async function resetDemo() {
+    if (API.token) {
+      try { await API.deleteAllOrders(); } catch {}
+    }
     localStorage.removeItem(STORAGE_KEY);
+    sessionStorage.removeItem('admin-token');
     location.reload();
   }
 
@@ -576,9 +590,7 @@
     }
     el.adminPasswordInput.disabled = false;
     el.adminPasswordSubmit.disabled = false;
-    el.adminPasswordHint.textContent = adminLock.attempts > 0
-      ? `Contraseña incorrecta. Intentos restantes: ${MAX_LOGIN_ATTEMPTS - adminLock.attempts}.`
-      : 'Ingresa la contraseña para ver el panel de administración.';
+    el.adminPasswordHint.textContent = 'Ingresa la contraseña para ver el panel de administración.';
   }
 
   function startAdminLockCountdown() {
@@ -605,31 +617,28 @@
     adminLockCountdown = null;
   }
 
-  function handleAdminPasswordSubmit(event) {
+  async function handleAdminPasswordSubmit(event) {
     event.preventDefault();
     if (isAdminLocked()) { updateAdminPasswordHint(); return; }
-    if (el.adminPasswordInput.value.trim() === ADMIN_PASSWORD) {
+    try {
+      const response = await API.login(el.adminPasswordInput.value.trim());
+      API.token = response.token;
+      sessionStorage.setItem('admin-token', response.token);
       adminLock = { attempts: 0, lockUntil: 0 };
-      saveAdminLock();
       closeAdminPasswordModal();
+      await loadAdminData();
       setScreen('admin');
       renderAdmin();
-      return;
-    }
-    adminLock.attempts += 1;
-    if (adminLock.attempts >= MAX_LOGIN_ATTEMPTS) {
-      adminLock.attempts = 0;
-      adminLock.lockUntil = Date.now() + LOCKOUT_DURATION_MS;
-    }
-    saveAdminLock();
-    el.adminPasswordInput.value = '';
-    if (isAdminLocked()) {
-      toast('Demasiados intentos fallidos. Acceso bloqueado temporalmente.');
-      startAdminLockCountdown();
-    } else {
-      toast('Contraseña incorrecta.');
-      updateAdminPasswordHint();
-      el.adminPasswordInput.focus();
+    } catch (err) {
+      el.adminPasswordInput.value = '';
+      if (err.data?.locked) {
+        adminLock.lockUntil = Date.now() + (err.data.remaining || 60) * 1000;
+        toast(err.message);
+        startAdminLockCountdown();
+      } else {
+        toast(err.message);
+        el.adminPasswordInput.focus();
+      }
     }
   }
 
